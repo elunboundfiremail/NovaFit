@@ -1,0 +1,90 @@
+Project NovaFit {
+  database_type: "PostgreSQL"
+  note: "Modelo relacional inicial para entrega 40% backend"
+}
+
+Enum tipo_cliente {
+  nuevo
+  antiguo
+}
+
+Enum tipo_plan_membresia {
+  mensual
+  anual
+  sesion
+}
+
+Enum estado_membresia {
+  activa
+  vencida
+  cancelada
+}
+
+Table clientes {
+  id uuid [pk]
+  ci varchar(20) [not null, unique]
+  nombres varchar(120) [not null]
+  apellido_paterno varchar(60) [not null]
+  apellido_materno varchar(60)
+  tipo_cliente tipo_cliente [not null, default: "nuevo"]
+  fecha_registro timestamptz [not null]
+  activo boolean [not null, default: true]
+}
+
+Table membresias {
+  id uuid [pk]
+  cliente_id uuid [not null]
+  tipo_plan tipo_plan_membresia [not null]
+  costo numeric(10,2) [not null]
+  fecha_inicio date [not null]
+  fecha_fin date [not null]
+  estado estado_membresia [not null, default: "activa"]
+  observacion varchar(250)
+  creado_en timestamptz [not null]
+}
+
+Table ingresos {
+  id uuid [pk]
+  cliente_id uuid [not null]
+  fecha_hora_ingreso timestamptz [not null]
+  permitido boolean [not null]
+  motivo_alerta varchar(200)
+  membresia_id uuid
+  creado_en timestamptz [not null]
+}
+
+Table casilleros {
+  id uuid [pk]
+  numero int [not null, unique]
+  disponible boolean [not null, default: true]
+  activo boolean [not null, default: true]
+  creado_en timestamptz [not null]
+}
+
+Table prestamos_casilleros {
+  id uuid [pk]
+  casillero_id uuid [not null]
+  cliente_id uuid [not null]
+  documento_retenido varchar(120) [not null]
+  fecha_hora_prestamo timestamptz [not null]
+  fecha_hora_devolucion timestamptz
+  observacion varchar(250)
+  creado_en timestamptz [not null]
+}
+
+Table promociones_festivas {
+  id uuid [pk]
+  nombre varchar(120) [not null]
+  descripcion varchar(250)
+  fecha_inicio date [not null]
+  fecha_fin date [not null]
+  porcentaje_descuento numeric(5,2) [not null]
+  activa boolean [not null, default: true]
+  creado_en timestamptz [not null]
+}
+
+Ref: membresias.cliente_id > clientes.id
+Ref: ingresos.cliente_id > clientes.id
+Ref: ingresos.membresia_id > membresias.id
+Ref: prestamos_casilleros.cliente_id > clientes.id
+Ref: prestamos_casilleros.casillero_id > casilleros.id
