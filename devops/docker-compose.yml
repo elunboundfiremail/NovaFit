@@ -1,51 +1,85 @@
-version: "3.8"
+version: '3.8'
 
 services:
+  # PostgreSQL Database
   postgres:
-    image: postgres:18-alpine
-    container_name: novafit-postgres
-    env_file:
-      - .env
+    image: postgres:16-alpine
+    container_name: novafit_postgres
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: novafit_db
+      POSTGRES_USER: novafit_user
+      POSTGRES_PASSWORD: Upds123
     ports:
-      - "${DB_PORT}:5432"
+      - "5432:5432"
     volumes:
-      - novafit_postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
-      - novafit_net
+      - novafit_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U novafit_user -d novafit_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
+  # Keycloak Authentication Server
   keycloak:
-    image: quay.io/keycloak/keycloak:26.2.4
-    container_name: novafit-keycloak
-    env_file:
-      - .env
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: novafit_keycloak
     environment:
-      KC_DB: dev-mem
-      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
-      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
-    command: start-dev --http-port=8080
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak_db
+      KC_DB_USERNAME: keycloak_user
+      KC_DB_PASSWORD: Upds123
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8080
+      KC_HTTP_ENABLED: true
+      KC_HEALTH_ENABLED: true
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: Upds123
     ports:
       - "8080:8080"
-    networks:
-      - novafit_net
-
-  api:
-    image: mcr.microsoft.com/dotnet/aspnet:9.0
-    container_name: novafit-api-placeholder
-    command: ["sh", "-c", "echo 'Integrar imagen de la API en el siguiente sprint'; sleep 3600"]
-    ports:
-      - "${BACKEND_PORT}:5000"
-    networks:
-      - novafit_net
     depends_on:
-      - postgres
-      - keycloak
+      postgres:
+        condition: service_healthy
+    networks:
+      - novafit_network
+    command:
+      - start-dev
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
 
-volumes:
-  novafit_postgres_data:
+  # PostgreSQL para Keycloak (separado para buenas practicas)
+  keycloak_postgres:
+    image: postgres:16-alpine
+    container_name: novafit_keycloak_db
+    environment:
+      POSTGRES_DB: keycloak_db
+      POSTGRES_USER: keycloak_user
+      POSTGRES_PASSWORD: Upds123
+    volumes:
+      - keycloak_postgres_data:/var/lib/postgresql/data
+    networks:
+      - novafit_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak_user -d keycloak_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
 networks:
-  novafit_net:
+  novafit_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  keycloak_postgres_data:
+    driver: local
