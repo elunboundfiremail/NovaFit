@@ -1,0 +1,104 @@
+{
+  "realm": "novafit-realm",
+  "enabled": true,
+  "displayName": "NovaFit Realm",
+  "displayNameHtml": "<div class=\"kc-logo-text\"><span>NovaFit</span></div>",
+  "accessTokenLifespan": 1800,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "offlineSessionIdleTimeout": 2592000,
+  "accessCodeLifespan": 60,
+  "accessCodeLifespanUserAction": 300,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "loginTheme": "keycloak",
+  "roles": {
+    "realm": [
+      {
+        "name": "admin",
+        "description": "Administrador del sistema",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "empleado",
+        "description": "Empleado del gimnasio",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "cliente",
+        "description": "Cliente del gimnasio",
+        "composite": false,
+        "clientRole": false
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "novafit-api",
+      "name": "NovaFit API Client",
+      "description": "Cliente para autenticacion de la API NovaFit",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "authorizationServicesEnabled": false,
+      "rootUrl": "http://localhost:5000",
+      "baseUrl": "http://localhost:5000",
+      "redirectUris": [
+        "http://localhost:5000/*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
+      "attributes": {
+        "access.token.lifespan": "1800"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "admin_novafit",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "NovaFit",
+      "email": "admin@novafit.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Upds123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "admin"
+      ]
+    },
+    {
+      "username": "empleado_novafit",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Empleado",
+      "lastName": "NovaFit",
+      "email": "empleado@novafit.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Upds123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "empleado"
+      ]
+    }
+  ]
+}
