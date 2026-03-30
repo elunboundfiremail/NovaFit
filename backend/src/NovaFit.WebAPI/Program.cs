@@ -61,6 +61,8 @@ builder.Services.AddScoped<IMembresiaService, MembresiaService>();
 builder.Services.AddScoped<IMembresiaRepository, MembresiaRepository>();
 builder.Services.AddScoped<IIngresoService, IngresoService>();
 builder.Services.AddScoped<IIngresoRepository, IngresoRepository>();
+builder.Services.AddScoped<ICasilleroService, CasilleroService>();
+builder.Services.AddScoped<ICasilleroRepository, CasilleroRepository>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
