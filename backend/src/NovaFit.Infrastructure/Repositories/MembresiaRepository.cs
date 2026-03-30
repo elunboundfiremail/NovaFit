@@ -41,6 +41,14 @@ public class MembresiaRepository : IMembresiaRepository
             .FirstOrDefaultAsync();
     }
 
+    public async Task<Membresia?> ObtenerUltimaPorCliente(Guid clienteId)
+    {
+        return await _context.Membresias
+            .Where(m => m.ClienteId == clienteId)
+            .OrderByDescending(m => m.FechaFin)
+            .FirstOrDefaultAsync();
+    }
+
     public async Task<Membresia> Crear(Membresia membresia)
     {
         _context.Membresias.Add(membresia);
