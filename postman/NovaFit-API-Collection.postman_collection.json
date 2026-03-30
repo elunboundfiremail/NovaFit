@@ -1,0 +1,699 @@
+{
+  "info": {
+    "name": "NovaFit API - Coleccion Completa",
+    "_postman_id": "novafit-api-collection-2026",
+    "description": "Coleccion Postman ajustada a los endpoints implementados en NovaFit.\n\nConfigura {{baseUrl}} y {{jwt_token}} antes de ejecutar los requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "clienteId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "clienteCi",
+      "value": "12345678",
+      "type": "string"
+    },
+    {
+      "key": "membresiaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ingresoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "casilleroId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "prestamoId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Clientes",
+      "item": [
+        {
+          "name": "Listar Clientes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener Cliente por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{clienteId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener Cliente por CI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes/ci/:ci",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes",
+                "ci",
+                ":ci"
+              ],
+              "variable": [
+                {
+                  "key": "ci",
+                  "value": "{{clienteCi}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear Cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var data = pm.response.json();",
+                  "    pm.collectionVariables.set(\"clienteId\", data.id);",
+                  "    pm.collectionVariables.set(\"clienteCi\", String(data.ci));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ci\": 12345678,\n  \"nombres\": \"Juan\",\n  \"apellidoPaterno\": \"Perez\",\n  \"apellidoMaterno\": \"Lopez\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar Cliente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Juan Carlos\",\n  \"apellidoPaterno\": \"Perez\",\n  \"apellidoMaterno\": \"Lopez\",\n  \"activo\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{clienteId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar Cliente",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{clienteId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Membresias",
+      "item": [
+        {
+          "name": "Listar Membresias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/membresias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "membresias"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener Membresia por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/membresias/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "membresias",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{membresiaId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener Membresia Activa por Cliente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/membresias/cliente/:clienteId/activa",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "membresias",
+                "cliente",
+                ":clienteId",
+                "activa"
+              ],
+              "variable": [
+                {
+                  "key": "clienteId",
+                  "value": "{{clienteId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear Membresia Mensual",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var data = pm.response.json();",
+                  "    pm.collectionVariables.set(\"membresiaId\", data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": \"{{clienteId}}\",\n  \"tipoPlan\": \"mensual\",\n  \"costo\": 150.00,\n  \"observacion\": \"Membresia mensual\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/membresias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "membresias"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear Membresia Anual",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": \"{{clienteId}}\",\n  \"tipoPlan\": \"anual\",\n  \"costo\": 1500.00,\n  \"observacion\": \"Membresia anual\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/membresias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "membresias"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cancelar Membresia",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/membresias/:id/cancelar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "membresias",
+                ":id",
+                "cancelar"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{membresiaId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Ingresos",
+      "item": [
+        {
+          "name": "Listar Ingresos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ingresos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ingresos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener Ingreso por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ingresos/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ingresos",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{ingresoId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Historial Ingresos por Cliente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ingresos/cliente/:clienteId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ingresos",
+                "cliente",
+                ":clienteId"
+              ],
+              "variable": [
+                {
+                  "key": "clienteId",
+                  "value": "{{clienteId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Registrar Ingreso",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 403) {",
+                  "    var data = pm.response.json();",
+                  "    pm.collectionVariables.set(\"ingresoId\", data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ci\": {{clienteCi}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ingresos/registrar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ingresos",
+                "registrar"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar Ingresos Rechazados",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ingresos/rechazados",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ingresos",
+                "rechazados"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Casilleros",
+      "item": [
+        {
+          "name": "Listar Casilleros",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/casilleros",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "casilleros"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener Casillero por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/casilleros/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "casilleros",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{casilleroId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar Casilleros Disponibles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/casilleros/disponibles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "casilleros",
+                "disponibles"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Prestar Casillero",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var data = pm.response.json();",
+                  "    pm.collectionVariables.set(\"prestamoId\", data.id);",
+                  "    pm.collectionVariables.set(\"casilleroId\", data.casilleroId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"casilleroId\": \"{{casilleroId}}\",\n  \"clienteId\": \"{{clienteId}}\",\n  \"documentoRetenido\": \"CI\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/casilleros/prestar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "casilleros",
+                "prestar"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Devolver Casillero",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/casilleros/devolver/:prestamoId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "casilleros",
+                "devolver",
+                ":prestamoId"
+              ],
+              "variable": [
+                {
+                  "key": "prestamoId",
+                  "value": "{{prestamoId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar Prestamos Activos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/casilleros/prestamos/activos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "casilleros",
+                "prestamos",
+                "activos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Historial Prestamos por Casillero",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/casilleros/historial/:casilleroId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "casilleros",
+                "historial",
+                ":casilleroId"
+              ],
+              "variable": [
+                {
+                  "key": "casilleroId",
+                  "value": "{{casilleroId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
