@@ -41,17 +41,17 @@ public class ClienteConfiguration : IEntityTypeConfiguration<Cliente>
 
         // Relaciones
         builder.HasMany(c => c.Membresias)
-            .WithOne()
+            .WithOne(m => m.Cliente)
             .HasForeignKey(m => m.ClienteId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(c => c.Ingresos)
-            .WithOne()
+            .WithOne(i => i.Cliente)
             .HasForeignKey(i => i.ClienteId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(c => c.PrestamosCasilleros)
-            .WithOne()
+            .WithOne(p => p.Cliente)
             .HasForeignKey(p => p.ClienteId)
             .OnDelete(DeleteBehavior.Restrict);
     }
