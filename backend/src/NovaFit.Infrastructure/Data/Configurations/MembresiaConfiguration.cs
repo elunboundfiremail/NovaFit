@@ -40,7 +40,7 @@ public class MembresiaConfiguration : IEntityTypeConfiguration<Membresia>
 
         // Relaciones
         builder.HasMany(m => m.Ingresos)
-            .WithOne()
+            .WithOne(i => i.Membresia)
             .HasForeignKey(i => i.MembresiaId)
             .OnDelete(DeleteBehavior.SetNull);
     }

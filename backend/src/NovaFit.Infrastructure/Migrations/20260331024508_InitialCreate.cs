@@ -74,8 +74,7 @@ namespace NovaFit.Infrastructure.Migrations
                     FechaFin = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Estado = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false, defaultValue: "activa"),
                     Observacion = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
-                    CreadoEn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ClienteId1 = table.Column<Guid>(type: "uuid", nullable: false)
+                    CreadoEn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -86,12 +85,6 @@ namespace NovaFit.Infrastructure.Migrations
                         principalTable: "clientes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_membresias_clientes_ClienteId1",
-                        column: x => x.ClienteId1,
-                        principalTable: "clientes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -105,9 +98,7 @@ namespace NovaFit.Infrastructure.Migrations
                     FechaHoraPrestamo = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     FechaHoraDevolucion = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     Observacion = table.Column<string>(type: "text", nullable: true),
-                    CreadoEn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CasilleroId1 = table.Column<Guid>(type: "uuid", nullable: false),
-                    ClienteId1 = table.Column<Guid>(type: "uuid", nullable: false)
+                    CreadoEn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -119,23 +110,11 @@ namespace NovaFit.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_prestamos_casilleros_casilleros_CasilleroId1",
-                        column: x => x.CasilleroId1,
-                        principalTable: "casilleros",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_prestamos_casilleros_clientes_ClienteId",
                         column: x => x.ClienteId,
                         principalTable: "clientes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_prestamos_casilleros_clientes_ClienteId1",
-                        column: x => x.ClienteId1,
-                        principalTable: "clientes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -148,9 +127,7 @@ namespace NovaFit.Infrastructure.Migrations
                     Permitido = table.Column<bool>(type: "boolean", nullable: false),
                     MotivoAlerta = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     MembresiaId = table.Column<Guid>(type: "uuid", nullable: true),
-                    CreadoEn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ClienteId1 = table.Column<Guid>(type: "uuid", nullable: false),
-                    MembresiaId1 = table.Column<Guid>(type: "uuid", nullable: true)
+                    CreadoEn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -162,22 +139,11 @@ namespace NovaFit.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ingresos_clientes_ClienteId1",
-                        column: x => x.ClienteId1,
-                        principalTable: "clientes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_ingresos_membresias_MembresiaId",
                         column: x => x.MembresiaId,
                         principalTable: "membresias",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "FK_ingresos_membresias_MembresiaId1",
-                        column: x => x.MembresiaId1,
-                        principalTable: "membresias",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -198,19 +164,9 @@ namespace NovaFit.Infrastructure.Migrations
                 columns: new[] { "ClienteId", "FechaHoraIngreso" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ingresos_ClienteId1",
-                table: "ingresos",
-                column: "ClienteId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ingresos_MembresiaId",
                 table: "ingresos",
                 column: "MembresiaId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ingresos_MembresiaId1",
-                table: "ingresos",
-                column: "MembresiaId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_membresias_ClienteId",
@@ -218,29 +174,14 @@ namespace NovaFit.Infrastructure.Migrations
                 column: "ClienteId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_membresias_ClienteId1",
-                table: "membresias",
-                column: "ClienteId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_prestamos_casilleros_CasilleroId_FechaHoraPrestamo",
                 table: "prestamos_casilleros",
                 columns: new[] { "CasilleroId", "FechaHoraPrestamo" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_prestamos_casilleros_CasilleroId1",
-                table: "prestamos_casilleros",
-                column: "CasilleroId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_prestamos_casilleros_ClienteId",
                 table: "prestamos_casilleros",
                 column: "ClienteId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_prestamos_casilleros_ClienteId1",
-                table: "prestamos_casilleros",
-                column: "ClienteId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_promociones_festivas_FechaInicio_FechaFin",
