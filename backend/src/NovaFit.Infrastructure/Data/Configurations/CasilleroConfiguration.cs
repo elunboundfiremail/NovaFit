@@ -22,7 +22,7 @@ public class CasilleroConfiguration : IEntityTypeConfiguration<Casillero>
 
         // Relaciones
         builder.HasMany(c => c.Prestamos)
-            .WithOne()
+            .WithOne(p => p.Casillero)
             .HasForeignKey(p => p.CasilleroId)
             .OnDelete(DeleteBehavior.Restrict);
     }

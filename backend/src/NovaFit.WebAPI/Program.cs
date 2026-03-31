@@ -114,6 +114,9 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Inicializar datos de prueba si la base esta vacia
+await SeedData.Initialize(app.Services);
+
 // Configurar pipeline HTTP
 if (app.Environment.IsDevelopment())
 {

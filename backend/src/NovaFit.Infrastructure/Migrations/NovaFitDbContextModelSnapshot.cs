@@ -105,9 +105,6 @@ namespace NovaFit.Infrastructure.Migrations
                     b.Property<Guid>("ClienteId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ClienteId1")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("CreadoEn")
                         .HasColumnType("timestamp with time zone");
 
@@ -115,9 +112,6 @@ namespace NovaFit.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid?>("MembresiaId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("MembresiaId1")
                         .HasColumnType("uuid");
 
                     b.Property<string>("MotivoAlerta")
@@ -129,11 +123,7 @@ namespace NovaFit.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClienteId1");
-
                     b.HasIndex("MembresiaId");
-
-                    b.HasIndex("MembresiaId1");
 
                     b.HasIndex("ClienteId", "FechaHoraIngreso");
 
@@ -147,9 +137,6 @@ namespace NovaFit.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("ClienteId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ClienteId1")
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("Costo")
@@ -184,8 +171,6 @@ namespace NovaFit.Infrastructure.Migrations
 
                     b.HasIndex("ClienteId");
 
-                    b.HasIndex("ClienteId1");
-
                     b.ToTable("membresias", (string)null);
                 });
 
@@ -198,13 +183,7 @@ namespace NovaFit.Infrastructure.Migrations
                     b.Property<Guid>("CasilleroId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("CasilleroId1")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("ClienteId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ClienteId1")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreadoEn")
@@ -225,11 +204,7 @@ namespace NovaFit.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CasilleroId1");
-
                     b.HasIndex("ClienteId");
-
-                    b.HasIndex("ClienteId1");
 
                     b.HasIndex("CasilleroId", "FechaHoraPrestamo");
 
@@ -278,26 +253,16 @@ namespace NovaFit.Infrastructure.Migrations
 
             modelBuilder.Entity("NovaFit.Domain.Entities.Ingreso", b =>
                 {
-                    b.HasOne("NovaFit.Domain.Entities.Cliente", null)
+                    b.HasOne("NovaFit.Domain.Entities.Cliente", "Cliente")
                         .WithMany("Ingresos")
                         .HasForeignKey("ClienteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("NovaFit.Domain.Entities.Cliente", "Cliente")
-                        .WithMany()
-                        .HasForeignKey("ClienteId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NovaFit.Domain.Entities.Membresia", null)
+                    b.HasOne("NovaFit.Domain.Entities.Membresia", "Membresia")
                         .WithMany("Ingresos")
                         .HasForeignKey("MembresiaId")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("NovaFit.Domain.Entities.Membresia", "Membresia")
-                        .WithMany()
-                        .HasForeignKey("MembresiaId1");
 
                     b.Navigation("Cliente");
 
@@ -306,16 +271,10 @@ namespace NovaFit.Infrastructure.Migrations
 
             modelBuilder.Entity("NovaFit.Domain.Entities.Membresia", b =>
                 {
-                    b.HasOne("NovaFit.Domain.Entities.Cliente", null)
+                    b.HasOne("NovaFit.Domain.Entities.Cliente", "Cliente")
                         .WithMany("Membresias")
                         .HasForeignKey("ClienteId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("NovaFit.Domain.Entities.Cliente", "Cliente")
-                        .WithMany()
-                        .HasForeignKey("ClienteId1")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Cliente");
@@ -323,28 +282,16 @@ namespace NovaFit.Infrastructure.Migrations
 
             modelBuilder.Entity("NovaFit.Domain.Entities.PrestamoCasillero", b =>
                 {
-                    b.HasOne("NovaFit.Domain.Entities.Casillero", null)
+                    b.HasOne("NovaFit.Domain.Entities.Casillero", "Casillero")
                         .WithMany("Prestamos")
                         .HasForeignKey("CasilleroId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("NovaFit.Domain.Entities.Casillero", "Casillero")
-                        .WithMany()
-                        .HasForeignKey("CasilleroId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NovaFit.Domain.Entities.Cliente", null)
+                    b.HasOne("NovaFit.Domain.Entities.Cliente", "Cliente")
                         .WithMany("PrestamosCasilleros")
                         .HasForeignKey("ClienteId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("NovaFit.Domain.Entities.Cliente", "Cliente")
-                        .WithMany()
-                        .HasForeignKey("ClienteId1")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Casillero");
