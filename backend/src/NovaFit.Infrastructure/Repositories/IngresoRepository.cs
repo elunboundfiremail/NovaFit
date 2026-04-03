@@ -24,33 +24,27 @@ public class IngresoRepository : IIngresoRepository
     public async Task<IEnumerable<Ingreso>> ObtenerTodos()
     {
         return await _context.Ingresos
-            .Include(i => i.Cliente)
-            .OrderByDescending(i => i.FechaHoraIngreso)
             .ToListAsync();
     }
 
     public async Task<Ingreso?> ObtenerPorId(Guid id)
     {
         return await _context.Ingresos
-            .Include(i => i.Cliente)
             .FirstOrDefaultAsync(i => i.Id == id);
     }
 
     public async Task<IEnumerable<Ingreso>> ObtenerPorCliente(Guid clienteId)
     {
         return await _context.Ingresos
-            .Include(i => i.Cliente)
             .Where(i => i.ClienteId == clienteId)
-            .OrderByDescending(i => i.FechaHoraIngreso)
             .ToListAsync();
     }
 
     public async Task<IEnumerable<Ingreso>> ObtenerRechazados()
     {
         return await _context.Ingresos
-            .Include(i => i.Cliente)
-            .Where(i => !i.Permitido)
-            .OrderByDescending(i => i.FechaHoraIngreso)
             .ToListAsync();
     }
 }
+
+

@@ -16,31 +16,25 @@ public class ClienteConfiguration : IEntityTypeConfiguration<Cliente>
         builder.HasIndex(c => c.Ci)
             .IsUnique();
 
-        builder.Property(c => c.Nombres)
+        builder.Property(c => c.Nombre)
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.Property(c => c.ApellidoPaterno)
+        builder.Property(c => c.Apellido)
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.Property(c => c.ApellidoMaterno)
-            .HasMaxLength(100);
+        builder.Property(c => c.Email)
+            .HasMaxLength(150);
 
-        builder.Property(c => c.TipoCliente)
-            .IsRequired()
-            .HasMaxLength(20)
-            .HasDefaultValue("nuevo");
+        builder.Property(c => c.Telefono)
+            .HasMaxLength(20);
 
         builder.Property(c => c.FechaRegistro)
             .IsRequired();
 
-        builder.Property(c => c.Activo)
-            .IsRequired()
-            .HasDefaultValue(true);
-
         // Relaciones
-        builder.HasMany(c => c.Membresias)
+        builder.HasMany(c => c.Suscripciones)
             .WithOne(m => m.Cliente)
             .HasForeignKey(m => m.ClienteId)
             .OnDelete(DeleteBehavior.Restrict);
@@ -50,9 +44,7 @@ public class ClienteConfiguration : IEntityTypeConfiguration<Cliente>
             .HasForeignKey(i => i.ClienteId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany(c => c.PrestamosCasilleros)
-            .WithOne(p => p.Cliente)
-            .HasForeignKey(p => p.ClienteId)
-            .OnDelete(DeleteBehavior.Restrict);
+        // Soft delete query filter
+        builder.HasQueryFilter(c => !c.Eliminado);
     }
 }

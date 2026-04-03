@@ -119,7 +119,20 @@ NovaFit/
 
 ## Como Levantar el Proyecto
 
-### 1. Levantar Docker
+### Opción A: Con Script de Inicio (Recomendado)
+
+```powershell
+.\scripts\start.ps1
+```
+
+Este script automáticamente:
+- Verifica Docker
+- Levanta servicios (PostgreSQL + Keycloak)
+- Aplica migraciones
+- Carga seed data
+- Inicia la API
+
+### Opción B: Manual
 
 Desde `devops`:
 
@@ -158,7 +171,12 @@ Verificar:
 
 ### 3. Obtener JWT
 
-Endpoint:
+**Opción rápida con script**:
+```powershell
+.\scripts\get-token.ps1
+```
+
+**Opción manual** - Endpoint:
 
 ```text
 POST http://localhost:8080/realms/novafit-realm/protocol/openid-connect/token
@@ -167,7 +185,6 @@ POST http://localhost:8080/realms/novafit-realm/protocol/openid-connect/token
 Body `x-www-form-urlencoded`:
 - `grant_type=password`
 - `client_id=novafit-api`
-- `client_secret=<secret del cliente>`
 - `username=admin_novafit`
 - `password=Upds123`
 
