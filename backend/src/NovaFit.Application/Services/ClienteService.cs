@@ -41,12 +41,12 @@ public class ClienteService : IClienteService
         {
             Id = Guid.NewGuid(),
             Ci = dto.Ci,
-            Nombres = dto.Nombres,
-            ApellidoPaterno = dto.ApellidoPaterno,
-            ApellidoMaterno = dto.ApellidoMaterno,
-            TipoCliente = "nuevo",
-            FechaRegistro = DateTime.UtcNow.AddHours(-4),
-            Activo = true
+            Nombre = dto.Nombre,
+            Apellido = dto.Apellido,
+            Email = dto.Email,
+            Telefono = dto.Telefono,
+            FechaNacimiento = dto.FechaNacimiento,
+            FechaRegistro = DateTime.UtcNow.AddHours(-4)
         };
 
         await _repository.Crear(cliente);
@@ -58,10 +58,11 @@ public class ClienteService : IClienteService
         var cliente = await _repository.ObtenerPorId(id);
         if (cliente == null) return null;
 
-        if (dto.Nombres != null) cliente.Nombres = dto.Nombres;
-        if (dto.ApellidoPaterno != null) cliente.ApellidoPaterno = dto.ApellidoPaterno;
-        if (dto.ApellidoMaterno != null) cliente.ApellidoMaterno = dto.ApellidoMaterno;
-        if (dto.Activo.HasValue) cliente.Activo = dto.Activo.Value;
+        if (dto.Nombre != null) cliente.Nombre = dto.Nombre;
+        if (dto.Apellido != null) cliente.Apellido = dto.Apellido;
+        if (dto.Email != null) cliente.Email = dto.Email;
+        if (dto.Telefono != null) cliente.Telefono = dto.Telefono;
+        if (dto.FechaNacimiento.HasValue) cliente.FechaNacimiento = dto.FechaNacimiento;
 
         await _repository.Actualizar(cliente);
         return MapearADto(cliente);
@@ -78,12 +79,12 @@ public class ClienteService : IClienteService
         {
             Id = cliente.Id,
             Ci = cliente.Ci,
-            Nombres = cliente.Nombres,
-            ApellidoPaterno = cliente.ApellidoPaterno,
-            ApellidoMaterno = cliente.ApellidoMaterno,
-            TipoCliente = cliente.TipoCliente,
-            FechaRegistro = cliente.FechaRegistro,
-            Activo = cliente.Activo
+            Nombre = cliente.Nombre,
+            Apellido = cliente.Apellido,
+            Email = cliente.Email,
+            Telefono = cliente.Telefono,
+            FechaNacimiento = cliente.FechaNacimiento,
+            FechaRegistro = cliente.FechaRegistro
         };
     }
 }

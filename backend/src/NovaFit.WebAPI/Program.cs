@@ -57,8 +57,8 @@ builder.Services.AddAuthorization();
 // Agregar servicios
 builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
-builder.Services.AddScoped<IMembresiaService, MembresiaService>();
-builder.Services.AddScoped<IMembresiaRepository, MembresiaRepository>();
+builder.Services.AddScoped<ISuscripcionService, SuscripcionService>();
+builder.Services.AddScoped<ISuscripcionRepository, SuscripcionRepository>();
 builder.Services.AddScoped<IIngresoService, IngresoService>();
 builder.Services.AddScoped<IIngresoRepository, IngresoRepository>();
 builder.Services.AddScoped<ICasilleroService, CasilleroService>();
@@ -115,7 +115,11 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Inicializar datos de prueba si la base esta vacia
-await SeedData.Initialize(app.Services);
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<NovaFitDbContext>();
+    await SeedData.Seed(context);
+}
 
 // Configurar pipeline HTTP
 if (app.Environment.IsDevelopment())

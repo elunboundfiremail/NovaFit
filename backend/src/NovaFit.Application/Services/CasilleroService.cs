@@ -37,44 +37,38 @@ public class CasilleroService : ICasilleroService
 
     public async Task<PrestamoDto> PrestarCasillero(PrestarCasilleroDto dto)
     {
-        if (dto.CasilleroId == Guid.Empty || dto.ClienteId == Guid.Empty)
-            throw new InvalidOperationException("CasilleroId y ClienteId son obligatorios");
-
-        if (string.IsNullOrWhiteSpace(dto.DocumentoRetenido))
-            throw new InvalidOperationException("Documento retenido es obligatorio");
+        if (dto.CasilleroId == Guid.Empty || dto.IngresoId == Guid.Empty)
+            throw new InvalidOperationException("CasilleroId e IngresoId son obligatorios");
 
         var casillero = await _casilleroRepository.ObtenerPorId(dto.CasilleroId);
         if (casillero is null)
             throw new InvalidOperationException("Casillero no encontrado");
 
-        if (!casillero.Activo)
-            throw new InvalidOperationException("Casillero no operativo");
-
-        if (await _casilleroRepository.TienePrestamoActivo(dto.CasilleroId))
+        if (casillero.Estado != "DISPONIBLE")
             throw new InvalidOperationException("Casillero no disponible");
 
-        var cliente = await _clienteRepository.ObtenerPorId(dto.ClienteId);
-        if (cliente is null)
-            throw new InvalidOperationException("Cliente no encontrado");
+        if (await _casilleroRepository.TienePrestamoActivo(dto.CasilleroId))
+            throw new InvalidOperationException("Casillero ya está en uso");
 
         var ahora = DateTime.UtcNow.AddHours(-4);
         var prestamo = new PrestamoCasillero
         {
             Id = Guid.NewGuid(),
             CasilleroId = dto.CasilleroId,
-            ClienteId = dto.ClienteId,
-            DocumentoRetenido = dto.DocumentoRetenido.Trim(),
-            FechaHoraPrestamo = ahora,
-            CreadoEn = ahora
+            IngresoId = dto.IngresoId,
+            NumeroTicket = dto.NumeroTicket,
+            CiDepositado = dto.CiDepositado,
+            FechaPrestamo = ahora,
+            HoraPrestamo = ahora.TimeOfDay,
+            FechaCreacion = ahora
         };
 
         await _casilleroRepository.CrearPrestamo(prestamo);
 
-        casillero.Disponible = false;
+        casillero.Estado = "OCUPADO";
         await _casilleroRepository.ActualizarCasillero(casillero);
 
         prestamo.Casillero = casillero;
-        prestamo.Cliente = cliente;
 
         return MapearPrestamo(prestamo);
     }
@@ -85,16 +79,19 @@ public class CasilleroService : ICasilleroService
         if (prestamo is null)
             throw new InvalidOperationException("Prestamo no encontrado");
 
-        if (prestamo.FechaHoraDevolucion is not null)
+        if (prestamo.FechaDevolucion is not null)
             throw new InvalidOperationException("Ya fue devuelto");
 
-        prestamo.FechaHoraDevolucion = DateTime.UtcNow.AddHours(-4);
+        var ahora = DateTime.UtcNow.AddHours(-4);
+        prestamo.FechaDevolucion = ahora;
+        prestamo.HoraDevolucion = ahora.TimeOfDay;
+        prestamo.Devuelto = true;
         await _casilleroRepository.ActualizarPrestamo(prestamo);
 
-        var casillero = await _casilleroRepository.ObtenerPorId(prestamo.CasilleroId);
+        var casillero = await _casilleroRepository.ObtenerPorId(prestamo.CasilleroId ?? Guid.Empty);
         if (casillero is not null)
         {
-            casillero.Disponible = true;
+            casillero.Estado = "DISPONIBLE";
             await _casilleroRepository.ActualizarCasillero(casillero);
             prestamo.Casillero = casillero;
         }
@@ -120,8 +117,9 @@ public class CasilleroService : ICasilleroService
         {
             Id = casillero.Id,
             Numero = casillero.Numero,
-            Disponible = casillero.Disponible,
-            Activo = casillero.Activo
+            Tipo = casillero.Tipo,
+            Estado = casillero.Estado,
+            Ubicacion = casillero.Ubicacion
         };
     }
 
@@ -131,12 +129,14 @@ public class CasilleroService : ICasilleroService
         {
             Id = prestamo.Id,
             CasilleroId = prestamo.CasilleroId,
-            ClienteId = prestamo.ClienteId,
-            NumeroCasillero = prestamo.Casillero.Numero,
-            NombreCliente = $"{prestamo.Cliente.Nombres} {prestamo.Cliente.ApellidoPaterno}".Trim(),
-            DocumentoRetenido = prestamo.DocumentoRetenido,
-            FechaHoraPrestamo = prestamo.FechaHoraPrestamo,
-            FechaHoraDevolucion = prestamo.FechaHoraDevolucion,
+            IngresoId = prestamo.IngresoId,
+            NumeroCasillero = prestamo.Casillero?.Numero ?? 0,
+            NumeroTicket = prestamo.NumeroTicket,
+            NumeroLlave = prestamo.NumeroLlave,
+            CiDepositado = prestamo.CiDepositado,
+            FechaPrestamo = prestamo.FechaPrestamo,
+            FechaDevolucion = prestamo.FechaDevolucion,
+            Devuelto = prestamo.Devuelto,
             EstaActivo = prestamo.EstaActivo()
         };
     }

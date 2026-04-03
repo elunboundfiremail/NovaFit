@@ -4,10 +4,12 @@ public class IngresoDto
 {
     public Guid Id { get; set; }
     public Guid ClienteId { get; set; }
-    public Guid? MembresiaId { get; set; }
-    public DateTime FechaHoraIngreso { get; set; }
-    public bool Permitido { get; set; }
-    public string? MotivoAlerta { get; set; }
+    public Guid? SuscripcionId { get; set; }
+    public DateTime FechaIngreso { get; set; }
+    public TimeSpan HoraIngreso { get; set; }
+    public TimeSpan? HoraSalida { get; set; }
+    public bool SalidaRegistrada { get; set; }
+    public int? DuracionMinutos { get; set; }
     public string NombreCliente { get; set; } = string.Empty;
     public int CiCliente { get; set; }
 }
