@@ -1,0 +1,134 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.filtros {
+  display: flex;
+  gap: 10px;
+}
+
+.filtro-btn {
+  padding: 8px 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.filtro-btn:hover {
+  background: var(--bg-hover);
+}
+
+.filtro-btn.active {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  border-color: var(--accent-primary);
+}
+
+.casilleros-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 15px;
+}
+
+.casillero-box {
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 15px;
+  text-align: center;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.casillero-box:hover {
+  transform: scale(1.05);
+}
+
+.casillero-numero {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.casillero-tipo {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+}
+
+.casillero-estado {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.casillero-ubicacion {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+
+.estado-disponible {
+  border-color: var(--success);
+}
+
+.estado-disponible .casillero-numero {
+  color: var(--success);
+}
+
+.estado-disponible .casillero-estado {
+  background: rgba(0, 200, 150, 0.2);
+  color: var(--success);
+}
+
+.estado-ocupado {
+  border-color: var(--warning);
+}
+
+.estado-ocupado .casillero-numero {
+  color: var(--warning);
+}
+
+.estado-ocupado .casillero-estado {
+  background: rgba(255, 167, 38, 0.2);
+  color: var(--warning);
+}
+
+.estado-mantenimiento {
+  border-color: var(--danger);
+  opacity: 0.6;
+}
+
+.estado-mantenimiento .casillero-numero {
+  color: var(--danger);
+}
+
+.estado-mantenimiento .casillero-estado {
+  background: rgba(255, 82, 82, 0.2);
+  color: var(--danger);
+}
+
+.table-container {
+  overflow: auto;
+  max-height: 400px;
+}
+
+.text-center {
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 13px;
+}

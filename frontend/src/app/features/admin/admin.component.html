@@ -1,0 +1,112 @@
+<div class="page-container">
+  <div class="page-header">
+    <h2>⚙️ Administración (Datos Sensibles)</h2>
+    <button *ngIf="autenticado" (click)="cerrarSesion()" class="btn btn-danger">Cerrar Sesión</button>
+  </div>
+
+  <!-- Login para acceso admin -->
+  <div *ngIf="!autenticado" class="login-admin">
+    <div class="login-box">
+      <h3>🔒 Autenticación Requerida</h3>
+      <p>Esta sección contiene operaciones sensibles</p>
+      <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" [(ngModel)]="usuario" placeholder="admin" class="form-control">
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" [(ngModel)]="contrasena" (keyup.enter)="verificarAcceso()" placeholder="••••••" class="form-control">
+      </div>
+      <button (click)="verificarAcceso()" class="btn btn-primary btn-block">Acceder</button>
+    </div>
+  </div>
+
+  <!-- Panel admin -->
+  <div *ngIf="autenticado" class="admin-panel">
+    <div class="tabs">
+      <button 
+        (click)="seccionActiva='clientes'" 
+        [class.active]="seccionActiva==='clientes'" 
+        class="tab-btn">
+        Eliminar Clientes
+      </button>
+      <button 
+        (click)="seccionActiva='suscripciones'" 
+        [class.active]="seccionActiva==='suscripciones'" 
+        class="tab-btn">
+        Cancelar Suscripciones
+      </button>
+      <button 
+        (click)="seccionActiva='casilleros'" 
+        [class.active]="seccionActiva==='casilleros'" 
+        class="tab-btn">
+        Gestionar Casilleros
+      </button>
+    </div>
+
+    <div class="tab-content">
+      <div *ngIf="seccionActiva==='clientes'" class="card">
+        <h3>⚠️ Eliminación de Clientes</h3>
+        <p class="warning-text">Esta operación marcará al cliente como eliminado (soft delete)</p>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>CI</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Fecha Registro</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="5" class="text-center">Funcionalidad disponible próximamente</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div *ngIf="seccionActiva==='suscripciones'" class="card">
+        <h3>⚠️ Cancelación de Suscripciones</h3>
+        <p class="warning-text">Cancelar una suscripción impedirá nuevos ingresos</p>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Tipo</th>
+                <th>Estado</th>
+                <th>Vencimiento</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="5" class="text-center">Funcionalidad disponible próximamente</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div *ngIf="seccionActiva==='casilleros'" class="card">
+        <h3>🔧 Mantenimiento de Casilleros</h3>
+        <p class="warning-text">Cambiar estado de casilleros (disponible/mantenimiento)</p>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Número</th>
+                <th>Tipo</th>
+                <th>Estado</th>
+                <th>Ubicación</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="5" class="text-center">Funcionalidad disponible próximamente</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,116 @@
+<div class="page-container">
+  <div class="page-header">
+    <h2>👥 Gestión de Clientes</h2>
+    <button (click)="nuevoCliente()" class="btn btn-primary">+ Nuevo Cliente</button>
+  </div>
+
+  <div class="grid-layout">
+    <!-- Lista de clientes -->
+    <div class="card clientes-lista">
+      <h3>Clientes Registrados</h3>
+      <div class="search-box">
+        <input type="text" placeholder="🔍 Buscar por CI o nombre..." class="input-search">
+      </div>
+      <div class="lista-scroll">
+        <div 
+          *ngFor="let cliente of clientes" 
+          (click)="seleccionarCliente(cliente)"
+          [class.selected]="clienteSeleccionado?.id === cliente.id"
+          class="cliente-item">
+          <div class="cliente-avatar">{{ cliente.nombre[0] }}{{ cliente.apellido[0] }}</div>
+          <div class="cliente-info">
+            <p class="cliente-nombre">{{ cliente.nombre }} {{ cliente.apellido }}</p>
+            <p class="cliente-ci">CI: {{ cliente.ci }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detalle y formulario -->
+    <div class="card detalle-cliente">
+      <div *ngIf="!clienteSeleccionado && !modoEdicion" class="empty-state">
+        <p>👈 Selecciona un cliente para ver detalles</p>
+      </div>
+
+      <!-- Formulario nuevo/editar -->
+      <div *ngIf="!clienteSeleccionado || modoEdicion" class="formulario">
+        <h3>{{ modoEdicion ? 'Editar Cliente' : 'Nuevo Cliente' }}</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>CI *</label>
+            <input type="number" [(ngModel)]="formulario.ci" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input type="text" [(ngModel)]="formulario.nombre" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Apellido *</label>
+            <input type="text" [(ngModel)]="formulario.apellido" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" [(ngModel)]="formulario.email" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input type="tel" [(ngModel)]="formulario.telefono" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Fecha Nacimiento</label>
+            <input type="date" [(ngModel)]="formulario.fechaNacimiento" class="form-control">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button (click)="guardarCliente()" class="btn btn-primary">Guardar</button>
+          <button (click)="clienteSeleccionado = null; modoEdicion = false" class="btn btn-secondary">Cancelar</button>
+        </div>
+      </div>
+
+      <!-- Detalle cliente -->
+      <div *ngIf="clienteSeleccionado && !modoEdicion" class="cliente-detalle">
+        <h3>Información del Cliente</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">CI:</span>
+            <span class="info-value">{{ clienteSeleccionado.ci }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Nombre:</span>
+            <span class="info-value">{{ clienteSeleccionado.nombre }} {{ clienteSeleccionado.apellido }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Email:</span>
+            <span class="info-value">{{ clienteSeleccionado.email || '--' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Teléfono:</span>
+            <span class="info-value">{{ clienteSeleccionado.telefono || '--' }}</span>
+          </div>
+        </div>
+
+        <h4>Historial de Ingresos</h4>
+        <div class="historial-scroll">
+          <table class="tabla-compacta">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Ingreso</th>
+                <th>Salida</th>
+                <th>Duración</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let ingreso of historialIngresos">
+                <td>{{ ingreso.fechaIngreso | date:'dd/MM/yyyy' }}</td>
+                <td>{{ ingreso.horaIngreso }}</td>
+                <td>{{ ingreso.horaSalida || '--' }}</td>
+                <td>{{ ingreso.duracionMinutos || '--' }} min</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
