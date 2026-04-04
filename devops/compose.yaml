@@ -80,7 +80,7 @@ services:
     container_name: novafit_backend
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=novafit_db;Username=novafit_user;Password=Upds123
+      ConnectionStrings__NovaFitDb: Host=postgres;Port=5432;Database=novafit_db;Username=novafit_user;Password=Upds123
       Keycloak__Authority: http://keycloak:8080/realms/novafit-realm
       Keycloak__Audience: novafit-api
     ports:
