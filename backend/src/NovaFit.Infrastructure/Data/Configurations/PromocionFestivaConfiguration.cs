@@ -31,9 +31,16 @@ public class PromocionFestivaConfiguration : IEntityTypeConfiguration<PromocionF
             .IsRequired()
             .HasDefaultValue(true);
 
-        builder.Property(p => p.CreadoEn)
+        builder.Property(p => p.VecesAplicada)
+            .IsRequired()
+            .HasDefaultValue(0);
+
+        builder.Property(p => p.FechaCreacion)
             .IsRequired();
 
         builder.HasIndex(p => new { p.FechaInicio, p.FechaFin });
+
+        // Soft delete query filter
+        builder.HasQueryFilter(p => !p.Eliminado);
     }
 }

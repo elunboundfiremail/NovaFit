@@ -1,84 +1,32 @@
-# Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-[Ww][Ii][Nn]32/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
-bld/
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-[Ll]ogs/
-
-# Visual Studio cache/options
+# IDEs
 .vs/
 .vscode/
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
-
-# User-specific files
-*.rsuser
-*.suo
-*.user
-*.userprefs
-
-# NuGet Packages
-*.nupkg
-*.snupkg
-**/packages/*
-!**/packages/build/
-*.nuget.props
-*.nuget.targets
-
-# Test Results
-[Tt]est[Rr]esult*/
-[Bb]uild[Ll]og.*
-*.trx
-
-# .NET Core
-project.lock.json
-project.fragment.lock.json
-artifacts/
-
-# ASP.NET Scaffolding
-ScaffoldingReadMe.txt
-
-# Entity Framework migrations
-**/Migrations/*.Designer.cs
-
-# Database
-*.db
-*.db-shm
-*.db-wal
-*.sqlite
-
-# Environment variables
-.env
-*.env
-!.env.example
-
-# IDE
 .idea/
-*.swp
-*.swo
-*~
 
-# OS
-.DS_Store
-Thumbs.db
+# Build
+bin/
+obj/
+dist/
+.angular/
 
-# Workspace folders (internal documentation)
-dev-workspace/
-feedback/
-docs/postman/results/
+# Dependencies
+node_modules/
+package-lock.json
 
-# Temporary files
+# Environment
+.env
 *.log
-*.tmp
-*.temp
+
+# Scripts y documentación interna (solo producción)
+scripts/
+ESTADO-PUERTOS.md
+GUIA-RAPIDA.md
+INSTRUCCIONES-FINALES.md
+RESUMEN-REFACTORIZACION.md
+README-*.md
+TESTING.md
+DEPLOY.md
+COMPATIBILIDAD.md
+MULTIPLATAFORMA.md
+COMPOSE-VARIANTS.md
+devops/README-DOCKER.md

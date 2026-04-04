@@ -16,7 +16,7 @@ public class CasilleroConfiguration : IEntityTypeConfiguration<Casillero>
         builder.HasIndex(c => c.Numero)
             .IsUnique();
 
-        builder.Property(c => c.Activo)
+        builder.Property(c => c.Eliminado)
             .IsRequired()
             .HasDefaultValue(true);
 
@@ -27,3 +27,4 @@ public class CasilleroConfiguration : IEntityTypeConfiguration<Casillero>
             .OnDelete(DeleteBehavior.Restrict);
     }
 }
+

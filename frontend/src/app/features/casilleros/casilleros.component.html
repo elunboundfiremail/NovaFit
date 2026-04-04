@@ -1,0 +1,62 @@
+<div class="page-container">
+  <div class="page-header">
+    <h2>🔒 Gestión de Casilleros</h2>
+    <div class="filtros">
+      <button (click)="filtroTipo='TODOS'" [class.active]="filtroTipo==='TODOS'" class="filtro-btn">Todos</button>
+      <button (click)="filtroTipo='FIJO'" [class.active]="filtroTipo==='FIJO'" class="filtro-btn">Fijos</button>
+      <button (click)="filtroTipo='TEMPORAL'" [class.active]="filtroTipo==='TEMPORAL'" class="filtro-btn">Temporales</button>
+      <button (click)="filtroTipo='ESTANTE_RECEPCION'" [class.active]="filtroTipo==='ESTANTE_RECEPCION'" class="filtro-btn">Estantes</button>
+    </div>
+  </div>
+
+  <!-- Mapa visual de casilleros -->
+  <div class="card">
+    <h3>Estado de Casilleros</h3>
+    <div class="casilleros-grid">
+      <div 
+        *ngFor="let casillero of casillerosFiltrados" 
+        [class]="'casillero-box ' + getClaseEstado(casillero.estado)">
+        <div class="casillero-numero">{{ casillero.numero }}</div>
+        <div class="casillero-tipo">{{ casillero.tipo }}</div>
+        <div class="casillero-estado">{{ casillero.estado }}</div>
+        <div class="casillero-ubicacion" *ngIf="casillero.ubicacion">
+          📍 {{ casillero.ubicacion }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Préstamos activos -->
+  <div class="card">
+    <h3>Préstamos Activos</h3>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Casillero</th>
+            <th>Ticket/Llave</th>
+            <th>CI Depositado</th>
+            <th>Desde</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let prestamo of prestamosActivos">
+            <td><strong>#{{ prestamo.numeroCasillero }}</strong></td>
+            <td>{{ prestamo.numeroTicket || prestamo.numeroLlave || '--' }}</td>
+            <td>{{ prestamo.ciDepositado || '--' }}</td>
+            <td>{{ prestamo.fechaPrestamo | date:'dd/MM HH:mm' }}</td>
+            <td>
+              <button (click)="devolverCasillero(prestamo.id)" class="btn btn-success btn-sm">
+                Devolver
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="prestamosActivos.length === 0">
+            <td colspan="5" class="text-center">No hay préstamos activos</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

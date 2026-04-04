@@ -1,0 +1,22 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+COPY NovaFit.sln ./
+COPY src/NovaFit.Domain/NovaFit.Domain.csproj src/NovaFit.Domain/
+COPY src/NovaFit.Application/NovaFit.Application.csproj src/NovaFit.Application/
+COPY src/NovaFit.Infrastructure/NovaFit.Infrastructure.csproj src/NovaFit.Infrastructure/
+COPY src/NovaFit.WebAPI/NovaFit.WebAPI.csproj src/NovaFit.WebAPI/
+
+RUN dotnet restore
+
+COPY src/ src/
+
+WORKDIR /src/src/NovaFit.WebAPI
+RUN dotnet publish -c Release -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+
+EXPOSE 8080
+ENTRYPOINT ["dotnet", "NovaFit.WebAPI.dll"]
