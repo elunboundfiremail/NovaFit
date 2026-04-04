@@ -1,4 +1,9 @@
-# Build outputs
+# IDEs
+.vs/
+.vscode/
+.idea/
+
+# Build
 bin/
 obj/
 dist/
@@ -8,28 +13,20 @@ dist/
 node_modules/
 package-lock.json
 
-# IDE
-.vs/
-.vscode/
-.idea/
+# Environment
+.env
+*.log
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Scripts y docs de desarrollo
+# Scripts y documentación interna (solo producción)
 scripts/
 ESTADO-PUERTOS.md
 GUIA-RAPIDA.md
 INSTRUCCIONES-FINALES.md
 RESUMEN-REFACTORIZACION.md
+README-*.md
 TESTING.md
 DEPLOY.md
 COMPATIBILIDAD.md
-**/Entities.md
+MULTIPLATAFORMA.md
 COMPOSE-VARIANTS.md
-README-*.md
-commit-to-github.*
-GITHUB-INSTRUCTIONS.md
-INSTRUCCIONES-PARA-TESTER.md
-RESUMEN-COMPLETADO.md
+devops/README-DOCKER.md
