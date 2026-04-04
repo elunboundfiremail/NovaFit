@@ -1,0 +1,60 @@
+<div class="page-container">
+  <div class="page-header">
+    <h2>💳 Gestión de Suscripciones</h2>
+  </div>
+
+  <!-- Formulario nueva suscripción -->
+  <div class="card">
+    <h3>Nueva Suscripción</h3>
+    <div class="form-inline">
+      <select [(ngModel)]="formulario.clienteId" class="form-control">
+        <option value="">Seleccione cliente...</option>
+        <option *ngFor="let cliente of clientes" [value]="cliente.id">
+          {{ cliente.ci }} - {{ cliente.nombre }} {{ cliente.apellido }}
+        </option>
+      </select>
+      <select [(ngModel)]="formulario.tipo" (change)="actualizarPrecio()" class="form-control">
+        <option value="CASUAL">Casual (Bs. 25)</option>
+        <option value="MENSUAL">Mensual (Bs. 200)</option>
+        <option value="ANUAL">Anual (Bs. 2000)</option>
+      </select>
+      <input type="number" [(ngModel)]="formulario.precio" class="form-control" readonly>
+      <button (click)="crearSuscripcion()" class="btn btn-primary">Crear</button>
+    </div>
+  </div>
+
+  <!-- Lista de suscripciones -->
+  <div class="card">
+    <h3>Suscripciones Activas</h3>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Tipo</th>
+            <th>Precio</th>
+            <th>Inicio</th>
+            <th>Vencimiento</th>
+            <th>Estado</th>
+            <th>Ingresos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let sus of suscripciones">
+            <td class="cliente-nombre">Cliente #{{ sus.clienteId.substring(0,8) }}</td>
+            <td>
+              <span class="badge-tipo">{{ sus.tipo }}</span>
+            </td>
+            <td>Bs. {{ sus.precio }}</td>
+            <td>{{ sus.fechaInicio | date:'dd/MM/yyyy' }}</td>
+            <td>{{ sus.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <span [class]="'badge-estado-' + sus.estado.toLowerCase()">{{ sus.estado }}</span>
+            </td>
+            <td>{{ sus.ingresosTotalesUsados }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

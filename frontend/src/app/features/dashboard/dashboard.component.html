@@ -1,0 +1,97 @@
+<div class="layout">
+  <!-- Sidebar izquierdo -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1 class="logo">🏋️ NovaFit</h1>
+      <p class="subtitle">Sistema de Gestión</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a 
+        *ngFor="let item of menuItems" 
+        [routerLink]="item.path"
+        routerLinkActive="active"
+        class="nav-item">
+        <span class="nav-icon">{{ item.icon }}</span>
+        <span class="nav-label">{{ item.label }}</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">👤</div>
+        <div>
+          <p class="user-name">Recepcionista</p>
+          <p class="user-role">Admin</p>
+        </div>
+      </div>
+      <div class="clock">
+        {{ currentTime | date:'HH:mm:ss' }}
+      </div>
+    </div>
+  </aside>
+
+  <!-- Contenido principal -->
+  <main class="main-content">
+    <div class="content-header">
+      <h2>Resumen del Día</h2>
+      <p class="date">{{ currentTime | date:'EEEE, d MMMM y' }}</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🚪</div>
+        <div class="stat-content">
+          <h3 class="stat-value">--</h3>
+          <p class="stat-label">Ingresos Hoy</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-content">
+          <h3 class="stat-value">--</h3>
+          <p class="stat-label">Clientes Activos</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">💳</div>
+        <div class="stat-content">
+          <h3 class="stat-value">--</h3>
+          <p class="stat-label">Suscripciones Vigentes</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🔒</div>
+        <div class="stat-content">
+          <h3 class="stat-value">--</h3>
+          <p class="stat-label">Casilleros Disponibles</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <h3>Acciones Rápidas</h3>
+      <div class="actions-grid">
+        <button class="action-btn" routerLink="/ingresos">
+          <span class="action-icon">➕</span>
+          <span>Registrar Ingreso</span>
+        </button>
+        <button class="action-btn" routerLink="/clientes">
+          <span class="action-icon">👤</span>
+          <span>Nuevo Cliente</span>
+        </button>
+        <button class="action-btn" routerLink="/casilleros">
+          <span class="action-icon">🔑</span>
+          <span>Asignar Casillero</span>
+        </button>
+        <button class="action-btn" routerLink="/suscripciones">
+          <span class="action-icon">💰</span>
+          <span>Nueva Suscripción</span>
+        </button>
+      </div>
+    </div>
+  </main>
+</div>

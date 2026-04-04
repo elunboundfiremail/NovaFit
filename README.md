@@ -1,266 +1,301 @@
 # NovaFit
 
-Sistema de gestion para gimnasio desarrollado como proyecto academico de Programacion Web II.
+Sistema integral de gestión para gimnasios con arquitectura moderna basada en microservicios.
 
-## Fase Actual
+## Descripción
 
-**1ra fase: 40% Backend**
+NovaFit es una aplicación web completa para la administración de gimnasios que incluye gestión de clientes, suscripciones, casilleros y registro de ingresos. El sistema utiliza autenticación basada en tokens JWT mediante Keycloak y está diseñado para ejecutarse en contenedores Docker.
 
-Estado actual:
-- API REST funcional con ASP.NET Core 9
-- PostgreSQL para persistencia
-- Keycloak para autenticacion JWT
-- Docker Compose para entorno local
-- Coleccion Postman para pruebas manuales
+## Tecnologías
 
-Modulos implementados:
-- Clientes
-- Membresias
-- Ingresos
-- Casilleros
-- Promociones festivas
+### Backend
+- .NET 9.0
+- Entity Framework Core 9.0
+- PostgreSQL 16
+- Arquitectura limpia (Clean Architecture)
 
-## Arquitectura
+### Frontend
+- Angular 19
+- TypeScript
+- Componentes standalone
+- Diseño responsivo con tema oscuro
 
-El proyecto sigue una estructura tipo Clean Architecture:
-
-- `NovaFit.Domain`: entidades del dominio
-- `NovaFit.Application`: DTOs, interfaces y servicios
-- `NovaFit.Infrastructure`: DbContext, configuraciones EF, repositorios, migraciones y seed
-- `NovaFit.WebAPI`: controllers, configuracion HTTP, autenticacion y DI
-
-## Tecnologias
-
-- Backend: .NET 9 / ASP.NET Core Web API
-- Base de datos: PostgreSQL 16
-- Autenticacion: Keycloak 26
-- ORM: Entity Framework Core
-- Contenedores: Docker Compose
-- Pruebas: Postman
-
-## Estructura del Proyecto
-
-```text
-NovaFit/
-├── backend/
-│   ├── NovaFit.sln
-│   ├── database/
-│   │   ├── migrations/
-│   │   └── schema/
-│   │       └── dbml/
-│   └── src/
-│       ├── NovaFit.Domain/
-│       │   └── Entities/
-│       ├── NovaFit.Application/
-│       │   ├── DTOs/
-│       │   ├── Interfaces/
-│       │   └── Services/
-│       ├── NovaFit.Infrastructure/
-│       │   ├── Data/
-│       │   │   └── Configurations/
-│       │   ├── Migrations/
-│       │   └── Repositories/
-│       └── NovaFit.WebAPI/
-│           ├── Controllers/
-│           └── Properties/
-├── devops/
-│   ├── docker-compose.yml
-│   ├── init-db.sql
-│   └── keycloak/
-│       ├── novafit-realm-export.json
-│       └── GUIA-CONFIGURACION-KEYCLOAK.md
-├── postman/
-│   └── NovaFit-API-Collection.postman_collection.json
-└── GUIA-FUNCIONAL-NOVAFIT.md
-```
-
-## Funcionalidades Backend
-
-### Clientes
-- Listar clientes
-- Obtener cliente por ID
-- Obtener cliente por CI
-- Crear cliente
-- Actualizar cliente
-- Eliminar cliente
-
-### Membresias
-- Listar membresias
-- Obtener membresia por ID
-- Obtener membresia activa por cliente
-- Crear membresia mensual o anual
-- Cancelar membresia
-
-### Ingresos
-- Listar ingresos
-- Obtener ingreso por ID
-- Ver historial por cliente
-- Registrar ingreso validando membresia vigente
-- Ver ingresos rechazados
-
-### Casilleros
-- Listar casilleros
-- Obtener casillero por ID
-- Listar casilleros disponibles
-- Prestar casillero
-- Devolver casillero
-- Ver prestamos activos
-- Ver historial por casillero
+### Infraestructura
+- Docker / Podman
+- Nginx
+- Keycloak 26.0
 
 ## Requisitos Previos
 
-- .NET 9 SDK
-- Docker Desktop
-- Postman
-- Puertos libres:
-  - `5432`
-  - `8080`
-  - `5000`
+### Windows
+- Docker Desktop 4.0+ o Podman 4.0+
+- .NET 9 SDK (opcional, para desarrollo)
+- Node.js 20+ (opcional, para desarrollo)
 
-## Como Levantar el Proyecto
+### Linux
+- Docker Engine 24.0+ o Podman 4.0+
+- Docker Compose v2 (incluido en Docker Engine)
 
-### 1. Levantar Docker
+## Instalación y Configuración
 
-Desde `devops`:
+### 1. Clonar el Repositorio
 
+```bash
+git clone https://github.com/elunboundfiremail/NovaFit.git
+cd NovaFit
+```
+
+### 2. Configurar Variables de Entorno
+
+Navegar a la carpeta de configuración:
+
+```bash
+cd devops
+```
+
+Crear archivo `.env` basado en `.env.example`:
+
+**Windows (PowerShell):**
 ```powershell
-docker-compose up -d
-docker-compose ps
+Copy-Item .env.example .env
 ```
 
-Servicios esperados:
-- `novafit_postgres`
-- `novafit_keycloak`
-- `novafit_keycloak_db`
-
-### 2. Configurar Keycloak
-
-Abrir:
-
-```text
-http://localhost:8080
+**Linux:**
+```bash
+cp .env.example .env
 ```
 
-Credenciales:
-- usuario: `admin`
-- password: `Upds123`
+Editar el archivo `.env` con las credenciales deseadas:
 
-Importar el realm desde:
+```
+POSTGRES_DB=novafit_db
+POSTGRES_USER=novafit_user
+POSTGRES_PASSWORD=SuPasswordSeguro123
 
-```text
-devops/keycloak/novafit-realm-export.json
+KEYCLOAK_ADMIN=admin_novafit
+KEYCLOAK_ADMIN_PASSWORD=SuPasswordSeguro123
 ```
 
-Verificar:
-- Realm `novafit-realm`
-- Client `novafit-api`
-- Usuarios `admin_novafit` y `empleado_novafit`
+### 3. Iniciar los Servicios
 
-### 3. Obtener JWT
+Desde la carpeta `devops`, ejecutar:
 
-Endpoint:
-
-```text
-POST http://localhost:8080/realms/novafit-realm/protocol/openid-connect/token
+**Con Docker:**
+```bash
+docker compose up -d
 ```
 
-Body `x-www-form-urlencoded`:
-- `grant_type=password`
-- `client_id=novafit-api`
-- `client_secret=<secret del cliente>`
-- `username=admin_novafit`
-- `password=Upds123`
-
-### 4. Aplicar migraciones
-
-Desde `backend`:
-
-```powershell
-dotnet ef database update --project src/NovaFit.Infrastructure --startup-project src/NovaFit.WebAPI
+**Con Podman:**
+```bash
+podman-compose up -d
 ```
 
-### 5. Ejecutar la API
+### 4. Verificar Estado de los Servicios
 
-```powershell
-dotnet run --project src/NovaFit.WebAPI --urls "http://localhost:5000"
+```bash
+docker compose ps
 ```
 
-### 6. Carga automatica de datos
+o
 
-La API ejecuta seed de datos al iniciar si la tabla de clientes esta vacia.
-
-Datos de prueba cargados:
-- clientes
-- membresias
-- ingresos
-- casilleros
-- prestamos
-- promociones
-
-## Coleccion Postman
-
-Archivo:
-
-```text
-postman/NovaFit-API-Collection.postman_collection.json
+```bash
+podman-compose ps
 ```
 
-Variables recomendadas:
-- `baseUrl = http://localhost:5000`
-- `jwt_token = <access_token>`
-- `clienteId`
-- `clienteCi`
-- `membresiaId`
-- `ingresoId`
-- `casilleroId`
-- `prestamoId`
+Los servicios deberían mostrar estado "healthy" o "running".
 
-## Flujo de Pruebas
+### 5. Aplicar Migraciones de Base de Datos
 
-Orden recomendado:
+**Opción A: Automático (ya incluido en init-db.sql)**
 
-1. `GET /api/clientes`
-2. `GET /api/membresias`
-3. `GET /api/ingresos/rechazados`
-4. `GET /api/casilleros/disponibles`
-5. `POST /api/clientes`
-6. `PUT /api/clientes/{id}`
-7. `POST /api/membresias`
-8. `POST /api/ingresos/registrar`
-9. `POST /api/casilleros/prestar`
-10. `POST /api/casilleros/devolver/{prestamoId}`
+Las tablas se crean automáticamente al iniciar PostgreSQL.
 
-## Evidencia Funcional
+**Opción B: Manual desde el contenedor backend**
 
-Estado validado manualmente:
-- autenticacion JWT funcionando
-- API respondiendo en `http://localhost:5000`
-- migraciones aplicadas correctamente
-- seed cargando datos de prueba
-- pruebas `GET`, `POST` y `PUT` ejecutadas en Postman
+```bash
+docker exec -it novafit_backend dotnet ef database update
+```
 
-Sugerencia para el reporte final:
-- agregar una captura del `GET /api/clientes` funcionando
-- agregar una captura del token generado en Keycloak/Postman
-- agregar una captura de Swagger o Postman con respuesta `200 OK`
+### 6. Configurar Keycloak
 
-## Hallazgos y Correcciones Relevantes
+Acceder a Keycloak:
+- URL: http://localhost:8081
+- Usuario: `admin_novafit`
+- Contraseña: la definida en `.env`
 
-- Se corrigio la configuracion de Keycloak en `docker-compose.yml`
-- Se corrigieron relaciones EF Core para evitar claves foraneas sombra
-- Se regenero la migracion inicial del proyecto
-- Se conecto el seed automatico al arranque de la API
+El realm `novafit-realm` y el cliente `novafit-api` se importan automáticamente desde la carpeta `devops/keycloak`.
 
-Pendiente conocido:
-- el `DELETE /api/clientes/{id}` todavia requiere ajuste a soft delete porque actualmente puede fallar por restricciones de llave foranea
+## Acceso a la Aplicación
 
-## Contribuidores
+Una vez iniciados todos los servicios:
 
-- `elunboundfiremail` - infraestructura base
-- `leo-aig` - funcionalidades backend
+- **Frontend:** http://localhost:4200
+- **Backend API:** http://localhost:8080/swagger
+- **Keycloak:** http://localhost:8081
+- **PostgreSQL:** localhost:5432
 
-## Proyecto Academico
+## Estructura del Proyecto
 
-Universidad Privada Domingo Savio  
-Programacion Web II - 2026
+```
+NovaFit/
+├── backend/
+│   ├── src/
+│   │   ├── NovaFit.Domain/         # Entidades y lógica de dominio
+│   │   ├── NovaFit.Application/    # Casos de uso y DTOs
+│   │   ├── NovaFit.Infrastructure/ # Persistencia y servicios externos
+│   │   └── NovaFit.WebAPI/         # Controladores y configuración API
+│   ├── Dockerfile
+│   └── NovaFit.sln
+├── frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── core/              # Servicios y guardias
+│   │   │   └── features/          # Componentes de funcionalidades
+│   │   └── environments/
+│   ├── nginx/
+│   │   └── nginx.conf
+│   ├── Dockerfile
+│   └── package.json
+├── devops/
+│   ├── compose.yaml               # Orquestación de contenedores
+│   ├── keycloak/                  # Configuración de realm
+│   ├── init-db.sql                # Script de inicialización DB
+│   └── .env.example
+└── postman/                       # Colección de pruebas API
+```
 
+## Endpoints Principales de la API
+
+### Clientes
+- `GET /api/clientes` - Listar todos los clientes
+- `GET /api/clientes/{id}` - Obtener cliente por ID
+- `POST /api/clientes` - Crear nuevo cliente
+- `PUT /api/clientes/{id}` - Actualizar cliente
+- `DELETE /api/clientes/{id}` - Eliminar cliente
+- `GET /api/clientes/ci/{ci}` - Buscar por cédula de identidad
+
+### Suscripciones
+- `GET /api/suscripciones` - Listar suscripciones
+- `GET /api/suscripciones/{id}` - Obtener suscripción
+- `POST /api/suscripciones` - Crear suscripción
+- `PUT /api/suscripciones/{id}` - Actualizar suscripción
+- `DELETE /api/suscripciones/{id}` - Eliminar suscripción
+
+### Ingresos
+- `GET /api/ingresos` - Listar registros de ingreso
+- `POST /api/ingresos` - Registrar entrada
+- `PUT /api/ingresos/{id}/salida` - Registrar salida
+
+### Casilleros
+- `GET /api/casilleros` - Listar casilleros
+- `GET /api/casilleros/disponibles` - Casilleros disponibles
+- `POST /api/casilleros` - Crear casillero
+- `PUT /api/casilleros/{id}` - Actualizar casillero
+- `DELETE /api/casilleros/{id}` - Eliminar casillero
+
+## Detener los Servicios
+
+```bash
+docker compose down
+```
+
+o
+
+```bash
+podman-compose down
+```
+
+Para eliminar también los volúmenes de datos:
+
+```bash
+docker compose down -v
+```
+
+## Desarrollo Local sin Docker
+
+### Backend
+
+```bash
+cd backend/src/NovaFit.WebAPI
+dotnet restore
+dotnet run
+```
+
+Configurar `appsettings.Development.json` con las cadenas de conexión apropiadas.
+
+### Frontend
+
+```bash
+cd frontend
+npm install --legacy-peer-deps
+npm start
+```
+
+La aplicación estará disponible en http://localhost:4200
+
+## Pruebas
+
+### Importar Colección Postman
+
+1. Abrir Postman
+2. Importar archivo `postman/NovaFit.postman_collection.json`
+3. Configurar variables de entorno (URL base, tokens)
+4. Ejecutar peticiones de prueba
+
+### Ejecutar Tests Unitarios (Backend)
+
+```bash
+cd backend
+dotnet test
+```
+
+## Solución de Problemas
+
+### Los contenedores no inician correctamente
+
+Verificar logs:
+```bash
+docker compose logs -f
+```
+
+### Error de conexión a base de datos
+
+Verificar que PostgreSQL esté saludable:
+```bash
+docker compose ps postgres
+```
+
+Revisar credenciales en archivo `.env`
+
+### Keycloak no responde
+
+Esperar 60-90 segundos después del inicio para que Keycloak complete su arranque. Verificar logs:
+```bash
+docker compose logs keycloak
+```
+
+### Error en migraciones de Entity Framework
+
+Recrear base de datos:
+```bash
+docker compose down -v
+docker compose up -d
+```
+
+## Licencia
+
+MIT License - ver archivo `LICENSE` para más detalles.
+
+## Contribuciones
+
+Las contribuciones son bienvenidas. Por favor:
+
+1. Fork el proyecto
+2. Crear una rama para la funcionalidad (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit los cambios (`git commit -m 'Agregar nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Abrir un Pull Request
+
+## Contacto
+
+Para consultas o soporte, abrir un issue en el repositorio de GitHub.

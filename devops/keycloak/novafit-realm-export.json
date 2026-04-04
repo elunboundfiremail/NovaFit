@@ -19,19 +19,7 @@
     "realm": [
       {
         "name": "admin",
-        "description": "Administrador del sistema",
-        "composite": false,
-        "clientRole": false
-      },
-      {
-        "name": "empleado",
-        "description": "Empleado del gimnasio",
-        "composite": false,
-        "clientRole": false
-      },
-      {
-        "name": "cliente",
-        "description": "Cliente del gimnasio",
+        "description": "Recepcionista con acceso completo al sistema",
         "composite": false,
         "clientRole": false
       }
@@ -80,24 +68,6 @@
       ],
       "realmRoles": [
         "admin"
-      ]
-    },
-    {
-      "username": "empleado_novafit",
-      "enabled": true,
-      "emailVerified": true,
-      "firstName": "Empleado",
-      "lastName": "NovaFit",
-      "email": "empleado@novafit.com",
-      "credentials": [
-        {
-          "type": "password",
-          "value": "Upds123",
-          "temporary": false
-        }
-      ],
-      "realmRoles": [
-        "empleado"
       ]
     }
   ]

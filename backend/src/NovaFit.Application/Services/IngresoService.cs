@@ -8,16 +8,16 @@ public class IngresoService : IIngresoService
 {
     private readonly IIngresoRepository _ingresoRepository;
     private readonly IClienteRepository _clienteRepository;
-    private readonly IMembresiaRepository _membresiaRepository;
+    private readonly ISuscripcionRepository _SuscripcionRepository;
 
     public IngresoService(
         IIngresoRepository ingresoRepository,
         IClienteRepository clienteRepository,
-        IMembresiaRepository membresiaRepository)
+        ISuscripcionRepository SuscripcionRepository)
     {
         _ingresoRepository = ingresoRepository;
         _clienteRepository = clienteRepository;
-        _membresiaRepository = membresiaRepository;
+        _SuscripcionRepository = SuscripcionRepository;
     }
 
     public async Task<IEnumerable<IngresoDto>> ObtenerTodos()
@@ -51,41 +51,40 @@ public class IngresoService : IIngresoService
             throw new InvalidOperationException("Cliente no encontrado");
 
         var ahora = DateTime.UtcNow.AddHours(-4);
-        var ultimaMembresia = await _membresiaRepository.ObtenerUltimaPorCliente(cliente.Id);
+        var ultimaSuscripcion = await _SuscripcionRepository.ObtenerUltimaPorCliente(cliente.Id);
 
         var ingreso = new Ingreso
         {
             Id = Guid.NewGuid(),
             ClienteId = cliente.Id,
-            FechaHoraIngreso = ahora,
-            CreadoEn = ahora
+            FechaIngreso = ahora, HoraIngreso = ahora.TimeOfDay,
+            FechaCreacion = ahora
         };
 
-        if (ultimaMembresia is null)
+        if (ultimaSuscripcion is null)
         {
-            ingreso.Permitido = false;
-            ingreso.MotivoAlerta = "No tiene membresia";
+            
+            
         }
-        else if (!string.Equals(ultimaMembresia.Estado, "activa", StringComparison.OrdinalIgnoreCase))
+        else if (!string.Equals(ultimaSuscripcion.Estado, "activa", StringComparison.OrdinalIgnoreCase))
         {
-            ingreso.Permitido = false;
-            ingreso.MotivoAlerta = $"Membresia {ultimaMembresia.Estado}";
+            
+            
         }
-        else if (!ultimaMembresia.EstaVigente())
+        else if (!ultimaSuscripcion.EstaVigente())
         {
-            ingreso.Permitido = false;
-            ingreso.MotivoAlerta = $"Membresia vencida desde {ultimaMembresia.FechaFin:dd/MM/yyyy}";
+            
+            
         }
         else
         {
-            ingreso.Permitido = true;
-            ingreso.MembresiaId = ultimaMembresia.Id;
+            
+            ingreso.SuscripcionId = ultimaSuscripcion.Id;
         }
 
         await _ingresoRepository.Crear(ingreso);
 
-        ingreso.Cliente = cliente;
-        ingreso.Membresia = ingreso.MembresiaId.HasValue ? ultimaMembresia : null;
+        ingreso.Suscripcion = ingreso.SuscripcionId.HasValue ? ultimaSuscripcion : null;
 
         return MapearADto(ingreso);
     }
@@ -96,12 +95,12 @@ public class IngresoService : IIngresoService
         {
             Id = ingreso.Id,
             ClienteId = ingreso.ClienteId,
-            MembresiaId = ingreso.MembresiaId,
-            FechaHoraIngreso = ingreso.FechaHoraIngreso,
-            Permitido = ingreso.Permitido,
-            MotivoAlerta = ingreso.MotivoAlerta,
-            NombreCliente = $"{ingreso.Cliente.Nombres} {ingreso.Cliente.ApellidoPaterno}".Trim(),
-            CiCliente = ingreso.Cliente.Ci
+            SuscripcionId = ingreso.SuscripcionId,
+            FechaIngreso = ingreso.FechaIngreso,
+            HoraIngreso = ingreso.HoraIngreso,
+            HoraSalida = ingreso.HoraSalida,
+            SalidaRegistrada = ingreso.SalidaRegistrada,
+            DuracionMinutos = ingreso.DuracionMinutos,
         };
     }
 }
