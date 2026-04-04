@@ -1,0 +1,116 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: novafit_db
+    environment:
+      POSTGRES_DB: novafit_db
+      POSTGRES_USER: novafit_user
+      POSTGRES_PASSWORD: Upds123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - novafit_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U novafit_user -d novafit_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  keycloak_postgres:
+    image: postgres:16-alpine
+    container_name: keycloak_db
+    environment:
+      POSTGRES_DB: keycloak_db
+      POSTGRES_USER: keycloak_user
+      POSTGRES_PASSWORD: Upds123
+    volumes:
+      - keycloak_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - novafit_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak_user -d keycloak_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: novafit_keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin_novafit
+      KEYCLOAK_ADMIN_PASSWORD: Upds123
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak_postgres:5432/keycloak_db
+      KC_DB_USERNAME: keycloak_user
+      KC_DB_PASSWORD: Upds123
+      KC_HOSTNAME_STRICT: 'false'
+      KC_HTTP_ENABLED: 'true'
+      KC_PROXY: edge
+    command:
+      - start-dev
+      - --import-realm
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
+    ports:
+      - "8081:8080"
+    networks:
+      - novafit_network
+    depends_on:
+      keycloak_postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: novafit_backend
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=novafit_db;Username=novafit_user;Password=Upds123
+      Keycloak__Authority: http://keycloak:8080/realms/novafit-realm
+      Keycloak__Audience: novafit-api
+    ports:
+      - "8080:8080"
+    networks:
+      - novafit_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: novafit_frontend
+    ports:
+      - "4200:80"
+    networks:
+      - novafit_network
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  novafit_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  keycloak_postgres_data:

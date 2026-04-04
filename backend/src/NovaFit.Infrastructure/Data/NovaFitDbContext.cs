@@ -11,7 +11,7 @@ public class NovaFitDbContext : DbContext
     }
 
     public DbSet<Cliente> Clientes { get; set; }
-    public DbSet<Membresia> Membresias { get; set; }
+    public DbSet<Suscripcion> Suscripcions { get; set; }
     public DbSet<Ingreso> Ingresos { get; set; }
     public DbSet<Casillero> Casilleros { get; set; }
     public DbSet<PrestamoCasillero> PrestamosCasilleros { get; set; }
@@ -24,9 +24,9 @@ public class NovaFitDbContext : DbContext
         // Aplicar todas las configuraciones de la carpeta Configurations
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(NovaFitDbContext).Assembly);
 
-        // Configurar nombres de tablas en minusculas (convencion PostgreSQL)
+        // Configurar Nombre de tablas en minusculas (convencion PostgreSQL)
         modelBuilder.Entity<Cliente>().ToTable("clientes");
-        modelBuilder.Entity<Membresia>().ToTable("membresias");
+        modelBuilder.Entity<Suscripcion>().ToTable("Suscripcions");
         modelBuilder.Entity<Ingreso>().ToTable("ingresos");
         modelBuilder.Entity<Casillero>().ToTable("casilleros");
         modelBuilder.Entity<PrestamoCasillero>().ToTable("prestamos_casilleros");

@@ -4,26 +4,29 @@ public class ClienteDto
 {
     public Guid Id { get; set; }
     public int Ci { get; set; }
-    public string Nombres { get; set; } = string.Empty;
-    public string ApellidoPaterno { get; set; } = string.Empty;
-    public string? ApellidoMaterno { get; set; }
-    public string TipoCliente { get; set; } = string.Empty;
+    public string Nombre { get; set; } = string.Empty;
+    public string Apellido { get; set; } = string.Empty;
+    public string? Email { get; set; }
+    public string? Telefono { get; set; }
+    public DateTime? FechaNacimiento { get; set; }
     public DateTime FechaRegistro { get; set; }
-    public bool Activo { get; set; }
 }
 
 public class CreateClienteDto
 {
     public int Ci { get; set; }
-    public string Nombres { get; set; } = string.Empty;
-    public string ApellidoPaterno { get; set; } = string.Empty;
-    public string? ApellidoMaterno { get; set; }
+    public string Nombre { get; set; } = string.Empty;
+    public string Apellido { get; set; } = string.Empty;
+    public string? Email { get; set; }
+    public string? Telefono { get; set; }
+    public DateTime? FechaNacimiento { get; set; }
 }
 
 public class UpdateClienteDto
 {
-    public string? Nombres { get; set; }
-    public string? ApellidoPaterno { get; set; }
-    public string? ApellidoMaterno { get; set; }
-    public bool? Activo { get; set; }
+    public string? Nombre { get; set; }
+    public string? Apellido { get; set; }
+    public string? Email { get; set; }
+    public string? Telefono { get; set; }
+    public DateTime? FechaNacimiento { get; set; }
 }

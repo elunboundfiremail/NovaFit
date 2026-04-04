@@ -17,8 +17,8 @@ public class ClienteRepository : IClienteRepository
     public async Task<IEnumerable<Cliente>> ObtenerTodos()
     {
         return await _context.Clientes
-            .Where(c => c.Activo)
-            .OrderBy(c => c.ApellidoPaterno)
+            .Where(c => !c.Eliminado)
+            .OrderBy(c => c.Apellido)
             .ToListAsync();
     }
 

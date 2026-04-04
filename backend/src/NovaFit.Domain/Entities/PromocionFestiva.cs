@@ -9,11 +9,21 @@ public class PromocionFestiva
     public DateTime FechaInicio { get; set; }
     public DateTime FechaFin { get; set; }
     public bool Activa { get; set; } = true;
-    public DateTime CreadoEn { get; set; }
+    
+    // Para reportes y análisis
+    public int VecesAplicada { get; set; } = 0;
+    
+    // Auditoría y soft delete
+    public DateTime FechaCreacion { get; set; }
+    public bool Eliminado { get; set; } = false;
+    public DateTime? FechaEliminacion { get; set; }
+
+    // Relaciones
+    public ICollection<Suscripcion> Suscripciones { get; set; } = new List<Suscripcion>();
 
     public bool EstaVigente()
     {
         var ahora = DateTime.UtcNow.AddHours(-4);
-        return Activa && ahora >= FechaInicio && ahora <= FechaFin;
+        return Activa && ahora >= FechaInicio && ahora <= FechaFin && !Eliminado;
     }
 }
