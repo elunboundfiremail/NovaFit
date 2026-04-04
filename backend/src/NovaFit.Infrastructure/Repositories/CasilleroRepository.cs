@@ -24,7 +24,7 @@ public class CasilleroRepository : ICasilleroRepository
     public async Task<IEnumerable<Casillero>> ObtenerDisponibles()
     {
         return await _context.Casilleros
-            .Where(c => c.Disponible && c.Activo)
+            .Where(c => c.Estado == "DISPONIBLE" && !c.Eliminado)
             .OrderBy(c => c.Numero)
             .ToListAsync();
     }
@@ -52,7 +52,6 @@ public class CasilleroRepository : ICasilleroRepository
     {
         return await _context.PrestamosCasilleros
             .Include(p => p.Casillero)
-            .Include(p => p.Cliente)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
@@ -67,9 +66,8 @@ public class CasilleroRepository : ICasilleroRepository
     {
         return await _context.PrestamosCasilleros
             .Include(p => p.Casillero)
-            .Include(p => p.Cliente)
-            .Where(p => p.FechaHoraDevolucion == null)
-            .OrderByDescending(p => p.FechaHoraPrestamo)
+            .Where(p => p.FechaDevolucion == null)
+            .OrderByDescending(p => p.FechaPrestamo)
             .ToListAsync();
     }
 
@@ -77,15 +75,15 @@ public class CasilleroRepository : ICasilleroRepository
     {
         return await _context.PrestamosCasilleros
             .Include(p => p.Casillero)
-            .Include(p => p.Cliente)
             .Where(p => p.CasilleroId == casilleroId)
-            .OrderByDescending(p => p.FechaHoraPrestamo)
+            .OrderByDescending(p => p.FechaPrestamo)
             .ToListAsync();
     }
 
     public async Task<bool> TienePrestamoActivo(Guid casilleroId)
     {
         return await _context.PrestamosCasilleros
-            .AnyAsync(p => p.CasilleroId == casilleroId && p.FechaHoraDevolucion == null);
+            .AnyAsync(p => p.CasilleroId == casilleroId && p.FechaDevolucion == null);
     }
 }
+

@@ -13,15 +13,16 @@ public class PrestamoCasilleroConfiguration : IEntityTypeConfiguration<PrestamoC
         builder.Property(p => p.CasilleroId)
             .IsRequired();
 
-        builder.Property(p => p.ClienteId)
+        builder.Property(p => p.IngresoId)
             .IsRequired();
 
-        builder.Property(p => p.FechaHoraPrestamo)
+        builder.Property(p => p.FechaPrestamo)
             .IsRequired();
 
-        builder.Property(p => p.FechaHoraDevolucion)
+        builder.Property(p => p.FechaDevolucion)
             .IsRequired(false);
 
-        builder.HasIndex(p => new { p.CasilleroId, p.FechaHoraPrestamo });
+        builder.HasIndex(p => new { p.CasilleroId, p.FechaPrestamo });
     }
 }
+

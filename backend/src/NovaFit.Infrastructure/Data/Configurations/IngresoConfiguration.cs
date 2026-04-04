@@ -13,21 +13,27 @@ public class IngresoConfiguration : IEntityTypeConfiguration<Ingreso>
         builder.Property(i => i.ClienteId)
             .IsRequired();
 
-        builder.Property(i => i.MembresiaId)
+        builder.Property(i => i.SuscripcionId)
             .IsRequired(false);
 
-        builder.Property(i => i.FechaHoraIngreso)
+        builder.Property(i => i.FechaIngreso)
             .IsRequired();
 
-        builder.Property(i => i.Permitido)
+        builder.Property(i => i.HoraIngreso)
             .IsRequired();
 
-        builder.Property(i => i.MotivoAlerta)
-            .HasMaxLength(500);
+        builder.Property(i => i.HoraSalida)
+            .IsRequired(false);
 
-        builder.Property(i => i.CreadoEn)
+        builder.Property(i => i.SalidaRegistrada)
             .IsRequired();
 
-        builder.HasIndex(i => new { i.ClienteId, i.FechaHoraIngreso });
+        builder.Property(i => i.FechaCreacion)
+            .IsRequired();
+
+        builder.HasIndex(i => new { i.ClienteId, i.FechaIngreso });
+
+        // Soft delete query filter
+        builder.HasQueryFilter(i => !i.Eliminado);
     }
 }

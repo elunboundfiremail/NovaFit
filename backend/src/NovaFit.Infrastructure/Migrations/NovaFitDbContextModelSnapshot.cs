@@ -28,21 +28,37 @@ namespace NovaFit.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("Activo")
+                    b.Property<Guid?>("AsignadoAClienteId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Eliminado")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true);
 
-                    b.Property<DateTime>("CreadoEn")
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("Disponible")
-                        .HasColumnType("boolean");
+                    b.Property<DateTime?>("FechaEliminacion")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Numero")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Ubicacion")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("AsignadoAClienteId");
 
                     b.HasIndex("Numero")
                         .IsUnique();
@@ -56,16 +72,7 @@ namespace NovaFit.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("Activo")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true);
-
-                    b.Property<string>("ApellidoMaterno")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("ApellidoPaterno")
+                    b.Property<string>("Apellido")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
@@ -73,20 +80,30 @@ namespace NovaFit.Infrastructure.Migrations
                     b.Property<int>("Ci")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("Eliminado")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<DateTime?>("FechaEliminacion")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("FechaNacimiento")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime>("FechaRegistro")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Nombres")
+                    b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<string>("TipoCliente")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("Telefono")
                         .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasDefaultValue("nuevo");
+                        .HasColumnType("character varying(20)");
 
                     b.HasKey("Id");
 
@@ -105,73 +122,40 @@ namespace NovaFit.Infrastructure.Migrations
                     b.Property<Guid>("ClienteId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreadoEn")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<int?>("DuracionMinutos")
+                        .HasColumnType("integer");
 
-                    b.Property<DateTime>("FechaHoraIngreso")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("MembresiaId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("MotivoAlerta")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<bool>("Permitido")
+                    b.Property<bool>("Eliminado")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("FechaEliminacion")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("FechaIngreso")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<TimeSpan>("HoraIngreso")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan?>("HoraSalida")
+                        .HasColumnType("interval");
+
+                    b.Property<bool>("SalidaRegistrada")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid?>("SuscripcionId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("MembresiaId");
+                    b.HasIndex("SuscripcionId");
 
-                    b.HasIndex("ClienteId", "FechaHoraIngreso");
+                    b.HasIndex("ClienteId", "FechaIngreso");
 
                     b.ToTable("ingresos", (string)null);
-                });
-
-            modelBuilder.Entity("NovaFit.Domain.Entities.Membresia", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ClienteId")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Costo")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<DateTime>("CreadoEn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Estado")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasDefaultValue("activa");
-
-                    b.Property<DateTime>("FechaFin")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("FechaInicio")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Observacion")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<string>("TipoPlan")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClienteId");
-
-                    b.ToTable("membresias", (string)null);
                 });
 
             modelBuilder.Entity("NovaFit.Domain.Entities.PrestamoCasillero", b =>
@@ -183,30 +167,52 @@ namespace NovaFit.Infrastructure.Migrations
                     b.Property<Guid>("CasilleroId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ClienteId")
+                    b.Property<int?>("CiDepositado")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("ClienteId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreadoEn")
+                    b.Property<bool>("Devuelto")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("Eliminado")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("DocumentoRetenido")
-                        .IsRequired()
+                    b.Property<DateTime?>("FechaDevolucion")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("FechaEliminacion")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("FechaPrestamo")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<TimeSpan?>("HoraDevolucion")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("HoraPrestamo")
+                        .HasColumnType("interval");
+
+                    b.Property<Guid>("IngresoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("NumeroLlave")
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("FechaHoraDevolucion")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("FechaHoraPrestamo")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Observacion")
+                    b.Property<string>("NumeroTicket")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ClienteId");
 
-                    b.HasIndex("CasilleroId", "FechaHoraPrestamo");
+                    b.HasIndex("IngresoId");
+
+                    b.HasIndex("CasilleroId", "FechaPrestamo");
 
                     b.ToTable("prestamos_casilleros", (string)null);
                 });
@@ -222,13 +228,19 @@ namespace NovaFit.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(true);
 
-                    b.Property<DateTime>("CreadoEn")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("Descripcion")
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
+
+                    b.Property<bool>("Eliminado")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("FechaEliminacion")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("FechaFin")
                         .HasColumnType("timestamp with time zone");
@@ -244,11 +256,99 @@ namespace NovaFit.Infrastructure.Migrations
                     b.Property<decimal>("PorcentajeDescuento")
                         .HasColumnType("decimal(5,2)");
 
+                    b.Property<int>("VecesAplicada")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
                     b.HasKey("Id");
 
                     b.HasIndex("FechaInicio", "FechaFin");
 
                     b.ToTable("promociones_festivas", (string)null);
+                });
+
+            modelBuilder.Entity("NovaFit.Domain.Entities.Suscripcion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("CasilleroFijoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ClienteId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("DescuentoAplicado")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(5,2)")
+                        .HasDefaultValue(0.00m);
+
+                    b.Property<bool>("Eliminado")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("ACTIVA");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("FechaEliminacion")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("FechaInicio")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("FechaVencimiento")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("IngresosTotalesUsados")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<decimal>("Precio")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<Guid?>("PromocionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CasilleroFijoId");
+
+                    b.HasIndex("ClienteId");
+
+                    b.HasIndex("Estado");
+
+                    b.HasIndex("PromocionId");
+
+                    b.HasIndex("Tipo");
+
+                    b.HasIndex("ClienteId", "Estado");
+
+                    b.ToTable("Suscripcions", (string)null);
+                });
+
+            modelBuilder.Entity("NovaFit.Domain.Entities.Casillero", b =>
+                {
+                    b.HasOne("NovaFit.Domain.Entities.Cliente", "AsignadoACliente")
+                        .WithMany()
+                        .HasForeignKey("AsignadoAClienteId");
+
+                    b.Navigation("AsignadoACliente");
                 });
 
             modelBuilder.Entity("NovaFit.Domain.Entities.Ingreso", b =>
@@ -259,25 +359,13 @@ namespace NovaFit.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("NovaFit.Domain.Entities.Membresia", "Membresia")
+                    b.HasOne("NovaFit.Domain.Entities.Suscripcion", "Suscripcion")
                         .WithMany("Ingresos")
-                        .HasForeignKey("MembresiaId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("SuscripcionId");
 
                     b.Navigation("Cliente");
 
-                    b.Navigation("Membresia");
-                });
-
-            modelBuilder.Entity("NovaFit.Domain.Entities.Membresia", b =>
-                {
-                    b.HasOne("NovaFit.Domain.Entities.Cliente", "Cliente")
-                        .WithMany("Membresias")
-                        .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Cliente");
+                    b.Navigation("Suscripcion");
                 });
 
             modelBuilder.Entity("NovaFit.Domain.Entities.PrestamoCasillero", b =>
@@ -288,32 +376,73 @@ namespace NovaFit.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("NovaFit.Domain.Entities.Cliente", "Cliente")
+                    b.HasOne("NovaFit.Domain.Entities.Cliente", null)
                         .WithMany("PrestamosCasilleros")
-                        .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasForeignKey("ClienteId");
+
+                    b.HasOne("NovaFit.Domain.Entities.Ingreso", "Ingreso")
+                        .WithMany("PrestamosCasilleros")
+                        .HasForeignKey("IngresoId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Casillero");
 
+                    b.Navigation("Ingreso");
+                });
+
+            modelBuilder.Entity("NovaFit.Domain.Entities.Suscripcion", b =>
+                {
+                    b.HasOne("NovaFit.Domain.Entities.Casillero", "CasilleroFijo")
+                        .WithMany("SuscripcionesConCasilleroFijo")
+                        .HasForeignKey("CasilleroFijoId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("NovaFit.Domain.Entities.Cliente", "Cliente")
+                        .WithMany("Suscripciones")
+                        .HasForeignKey("ClienteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("NovaFit.Domain.Entities.PromocionFestiva", "Promocion")
+                        .WithMany("Suscripciones")
+                        .HasForeignKey("PromocionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("CasilleroFijo");
+
                     b.Navigation("Cliente");
+
+                    b.Navigation("Promocion");
                 });
 
             modelBuilder.Entity("NovaFit.Domain.Entities.Casillero", b =>
                 {
                     b.Navigation("Prestamos");
+
+                    b.Navigation("SuscripcionesConCasilleroFijo");
                 });
 
             modelBuilder.Entity("NovaFit.Domain.Entities.Cliente", b =>
                 {
                     b.Navigation("Ingresos");
 
-                    b.Navigation("Membresias");
+                    b.Navigation("PrestamosCasilleros");
 
+                    b.Navigation("Suscripciones");
+                });
+
+            modelBuilder.Entity("NovaFit.Domain.Entities.Ingreso", b =>
+                {
                     b.Navigation("PrestamosCasilleros");
                 });
 
-            modelBuilder.Entity("NovaFit.Domain.Entities.Membresia", b =>
+            modelBuilder.Entity("NovaFit.Domain.Entities.PromocionFestiva", b =>
+                {
+                    b.Navigation("Suscripciones");
+                });
+
+            modelBuilder.Entity("NovaFit.Domain.Entities.Suscripcion", b =>
                 {
                     b.Navigation("Ingresos");
                 });

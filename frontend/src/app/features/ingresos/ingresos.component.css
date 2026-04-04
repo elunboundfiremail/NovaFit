@@ -1,0 +1,145 @@
+.page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 30px;
+}
+
+.page-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 5px;
+}
+
+.page-header p {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 25px;
+  margin-bottom: 20px;
+}
+
+.card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.registro-rapido {
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+}
+
+.form-inline {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.input-ci {
+  flex: 1;
+  padding: 14px;
+  font-size: 16px;
+  border: 2px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-radius: 6px;
+}
+
+.input-ci:focus {
+  border-color: var(--accent-primary);
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+.mensaje-exito {
+  color: var(--success);
+  font-weight: 500;
+  padding: 10px;
+  background: rgba(0, 200, 150, 0.1);
+  border-radius: 4px;
+}
+
+.mensaje-error {
+  color: var(--danger);
+  font-weight: 500;
+  padding: 10px;
+  background: rgba(255, 82, 82, 0.1);
+  border-radius: 4px;
+}
+
+.table-container {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 500px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-tertiary);
+  color: var(--accent-primary);
+  font-weight: 600;
+  padding: 14px;
+  text-align: left;
+  border-bottom: 2px solid var(--border-color);
+  z-index: 10;
+}
+
+td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+.nombre-cliente {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.text-center {
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.badge-activo {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(0, 217, 255, 0.2);
+  color: var(--accent-primary);
+}
+
+.badge-completado {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(0, 200, 150, 0.2);
+  color: var(--success);
+}

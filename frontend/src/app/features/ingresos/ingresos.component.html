@@ -1,0 +1,99 @@
+<div class="page-container">
+  <div class="page-header">
+    <h2>🚪 Registro de Ingresos/Salidas</h2>
+    <p>Control de acceso al gimnasio</p>
+  </div>
+
+  <!-- Formulario rápido de ingreso -->
+  <div class="card registro-rapido">
+    <h3>Registrar Ingreso</h3>
+    <div class="form-inline">
+      <input 
+        type="number" 
+        [(ngModel)]="ci" 
+        placeholder="Ingrese CI del cliente"
+        (keyup.enter)="registrarIngreso()"
+        class="input-ci"
+        [disabled]="loading">
+      <button 
+        (click)="registrarIngreso()" 
+        class="btn btn-primary"
+        [disabled]="loading || !ci">
+        {{ loading ? 'Procesando...' : 'Registrar' }}
+      </button>
+    </div>
+    <p *ngIf="mensaje" [class]="mensaje.includes('✅') ? 'mensaje-exito' : 'mensaje-error'">
+      {{ mensaje }}
+    </p>
+  </div>
+
+  <!-- Tabla de ingresos activos -->
+  <div class="card">
+    <h3>Personas Actualmente en el Gimnasio</h3>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>CI</th>
+            <th>Cliente</th>
+            <th>Hora Ingreso</th>
+            <th>Duración</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ingreso of ingresosActivos">
+            <td>{{ ingreso.ciCliente }}</td>
+            <td class="nombre-cliente">{{ ingreso.nombreCliente }}</td>
+            <td>{{ ingreso.horaIngreso }}</td>
+            <td>{{ ingreso.duracionMinutos || '--' }} min</td>
+            <td>
+              <button 
+                (click)="registrarSalida(ingreso.id)" 
+                class="btn btn-success btn-sm"
+                [disabled]="loading">
+                Registrar Salida
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="ingresosActivos.length === 0">
+            <td colspan="5" class="text-center">No hay personas en el gimnasio</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Historial del día -->
+  <div class="card">
+    <h3>Historial del Día</h3>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>CI</th>
+            <th>Cliente</th>
+            <th>Ingreso</th>
+            <th>Salida</th>
+            <th>Duración</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ingreso of ingresos">
+            <td>{{ ingreso.ciCliente }}</td>
+            <td class="nombre-cliente">{{ ingreso.nombreCliente }}</td>
+            <td>{{ ingreso.horaIngreso }}</td>
+            <td>{{ ingreso.horaSalida || '--' }}</td>
+            <td>{{ ingreso.duracionMinutos || '--' }} min</td>
+            <td>
+              <span [class]="ingreso.salidaRegistrada ? 'badge-completado' : 'badge-activo'">
+                {{ ingreso.salidaRegistrada ? 'Completado' : 'En Gimnasio' }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

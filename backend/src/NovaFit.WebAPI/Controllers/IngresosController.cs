@@ -54,12 +54,6 @@ public class IngresosController : ControllerBase
         try
         {
             var ingreso = await _ingresoService.RegistrarIngreso(dto.Ci);
-
-            if (!ingreso.Permitido)
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, ingreso);
-            }
-
             return Ok(ingreso);
         }
         catch (InvalidOperationException ex)

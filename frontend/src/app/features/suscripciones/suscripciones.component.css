@@ -1,0 +1,68 @@
+.form-inline {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.form-control {
+  padding: 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+select.form-control {
+  cursor: pointer;
+}
+
+.badge-tipo {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--bg-tertiary);
+  color: var(--accent-primary);
+  text-transform: uppercase;
+}
+
+.badge-estado-activa {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(0, 200, 150, 0.2);
+  color: var(--success);
+}
+
+.badge-estado-vencida {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255, 82, 82, 0.2);
+  color: var(--danger);
+}
+
+.badge-estado-cancelada {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(128, 128, 128, 0.2);
+  color: var(--text-muted);
+}
+
+.cliente-nombre {
+  font-weight: 500;
+}
