@@ -74,13 +74,28 @@ export class ClientesComponent implements OnInit {
       return;
     }
 
-    this.clienteService.create(this.formulario).subscribe({
-      next: () => {
+    const payload = {
+      ci: this.formulario.ci,
+      nombre: this.formulario.nombre.trim(),
+      apellido: this.formulario.apellido.trim(),
+      email: this.formulario.email.trim() || undefined,
+      telefono: this.formulario.telefono.trim() || undefined,
+      fechaNacimiento: this.formulario.fechaNacimiento || undefined
+    };
+
+    this.clienteService.create(payload).subscribe({
+      next: (clienteCreado) => {
         this.cargarClientes();
+        this.clienteSeleccionado = clienteCreado;
         this.nuevoCliente();
         alert('✅ Cliente creado exitosamente');
       },
-      error: (err) => alert(`❌ Error: ${err.error?.message}`)
+      error: (err) => {
+        const mensaje = typeof err.error === 'string'
+          ? err.error
+          : err.error?.message || err.message || 'No se pudo crear el cliente';
+        alert(`❌ Error: ${mensaje}`);
+      }
     });
   }
 }

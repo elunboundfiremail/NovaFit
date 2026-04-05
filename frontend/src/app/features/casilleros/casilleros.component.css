@@ -51,6 +51,10 @@
   transform: scale(1.05);
 }
 
+.casillero-box.seleccionado {
+  box-shadow: 0 0 0 2px var(--accent-primary);
+}
+
 .casillero-numero {
   font-size: 28px;
   font-weight: 700;
@@ -131,4 +135,22 @@
 .btn-sm {
   padding: 6px 14px;
   font-size: 13px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
 }

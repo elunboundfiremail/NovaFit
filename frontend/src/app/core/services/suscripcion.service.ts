@@ -17,11 +17,11 @@ export class SuscripcionService {
   }
 
   getActivas(): Observable<Suscripcion[]> {
-    return this.http.get<Suscripcion[]>(`${this.apiUrl}/activas`);
+    return this.http.get<Suscripcion[]>(`${this.apiUrl}`);
   }
 
   getVigentes(): Observable<Suscripcion[]> {
-    return this.http.get<Suscripcion[]>(`${this.apiUrl}/vigentes`);
+    return this.http.get<Suscripcion[]>(`${this.apiUrl}`);
   }
 
   getByCliente(clienteId: string): Observable<Suscripcion[]> {
@@ -33,6 +33,6 @@ export class SuscripcionService {
   }
 
   cancelar(id: string): Observable<boolean> {
-    return this.http.post<boolean>(`${this.apiUrl}/${id}/cancelar`, {});
+    return this.http.put<boolean>(`${this.apiUrl}/${id}/cancelar`, {});
   }
 }

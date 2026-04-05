@@ -9,4 +9,5 @@ public interface IIngresoService
     Task<IEnumerable<IngresoDto>> ObtenerPorCliente(Guid clienteId);
     Task<IEnumerable<IngresoDto>> ObtenerRechazados();
     Task<IngresoDto> RegistrarIngreso(int ci);
+    Task<IngresoDto?> RegistrarSalida(Guid ingresoId);
 }

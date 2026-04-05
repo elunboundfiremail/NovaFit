@@ -8,5 +8,7 @@ public interface IIngresoRepository
     Task<IEnumerable<Ingreso>> ObtenerTodos();
     Task<Ingreso?> ObtenerPorId(Guid id);
     Task<IEnumerable<Ingreso>> ObtenerPorCliente(Guid clienteId);
+    Task<Ingreso?> ObtenerActivoPorCliente(Guid clienteId);
     Task<IEnumerable<Ingreso>> ObtenerRechazados();
+    Task<Ingreso> Actualizar(Ingreso ingreso);
 }

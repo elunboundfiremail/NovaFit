@@ -61,4 +61,21 @@ public class IngresosController : ControllerBase
             return NotFound(ex.Message);
         }
     }
+
+    [HttpPost("{id}/salida")]
+    public async Task<ActionResult<IngresoDto>> RegistrarSalida(Guid id)
+    {
+        try
+        {
+            var ingreso = await _ingresoService.RegistrarSalida(id);
+            if (ingreso is null)
+                return NotFound("Ingreso no encontrado");
+
+            return Ok(ingreso);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 }
