@@ -35,6 +35,71 @@ public class CasilleroService : ICasilleroService
         return casilleros.Select(MapearCasillero);
     }
 
+    public async Task<CasilleroDto> CrearCasillero(CreateCasilleroDto dto)
+    {
+        ValidarCasillero(dto.Numero, dto.Tipo, dto.Estado);
+
+        var existente = await _casilleroRepository.ObtenerPorNumero(dto.Numero);
+        if (existente is not null)
+            throw new InvalidOperationException("Ya existe un casillero con ese numero");
+
+        var ahora = DateTime.UtcNow.AddHours(-4);
+        var casillero = new Casillero
+        {
+            Id = Guid.NewGuid(),
+            Numero = dto.Numero,
+            Tipo = NormalizarTipo(dto.Tipo),
+            Estado = NormalizarEstado(dto.Estado),
+            Ubicacion = string.IsNullOrWhiteSpace(dto.Ubicacion) ? null : dto.Ubicacion.Trim(),
+            FechaCreacion = ahora
+        };
+
+        await _casilleroRepository.CrearCasillero(casillero);
+        return MapearCasillero(casillero);
+    }
+
+    public async Task<CasilleroDto?> ActualizarCasillero(Guid id, UpdateCasilleroDto dto)
+    {
+        var casillero = await _casilleroRepository.ObtenerPorId(id);
+        if (casillero is null || casillero.Eliminado)
+            return null;
+
+        ValidarCasillero(dto.Numero, dto.Tipo, dto.Estado);
+
+        var existente = await _casilleroRepository.ObtenerPorNumero(dto.Numero);
+        if (existente is not null && existente.Id != id)
+            throw new InvalidOperationException("Ya existe un casillero con ese numero");
+
+        if (casillero.Estado == "OCUPADO" && NormalizarEstado(dto.Estado) != "OCUPADO")
+        {
+            if (await _casilleroRepository.TienePrestamoActivo(id))
+                throw new InvalidOperationException("No se puede cambiar el estado de un casillero con prestamo activo");
+        }
+
+        casillero.Numero = dto.Numero;
+        casillero.Tipo = NormalizarTipo(dto.Tipo);
+        casillero.Estado = NormalizarEstado(dto.Estado);
+        casillero.Ubicacion = string.IsNullOrWhiteSpace(dto.Ubicacion) ? null : dto.Ubicacion.Trim();
+
+        await _casilleroRepository.ActualizarCasillero(casillero);
+        return MapearCasillero(casillero);
+    }
+
+    public async Task<bool> EliminarCasillero(Guid id)
+    {
+        var casillero = await _casilleroRepository.ObtenerPorId(id);
+        if (casillero is null || casillero.Eliminado)
+            return false;
+
+        if (casillero.Estado == "OCUPADO" || await _casilleroRepository.TienePrestamoActivo(id))
+            throw new InvalidOperationException("No se puede eliminar un casillero ocupado o con prestamo activo");
+
+        casillero.Eliminado = true;
+        casillero.FechaEliminacion = DateTime.UtcNow.AddHours(-4);
+        await _casilleroRepository.ActualizarCasillero(casillero);
+        return true;
+    }
+
     public async Task<PrestamoDto> PrestarCasillero(PrestarCasilleroDto dto)
     {
         if (dto.CasilleroId == Guid.Empty || dto.IngresoId == Guid.Empty)
@@ -121,6 +186,36 @@ public class CasilleroService : ICasilleroService
             Estado = casillero.Estado,
             Ubicacion = casillero.Ubicacion
         };
+    }
+
+    private static void ValidarCasillero(int numero, string tipo, string estado)
+    {
+        if (numero <= 0)
+            throw new InvalidOperationException("El numero del casillero debe ser mayor a 0");
+
+        _ = NormalizarTipo(tipo);
+        _ = NormalizarEstado(estado);
+    }
+
+    private static string NormalizarTipo(string tipo)
+    {
+        var tipoNormalizado = tipo.Trim().ToUpperInvariant();
+        if (tipoNormalizado is not ("FIJO" or "TEMPORAL" or "ESTANTE_RECEPCION"))
+            throw new InvalidOperationException("Tipo de casillero invalido");
+
+        return tipoNormalizado;
+    }
+
+    private static string NormalizarEstado(string estado)
+    {
+        var estadoNormalizado = estado.Trim().ToUpperInvariant();
+        if (estadoNormalizado == "ACTIVO")
+            return "DISPONIBLE";
+
+        if (estadoNormalizado is not ("DISPONIBLE" or "OCUPADO" or "MANTENIMIENTO" or "EN_MANTENIMIENTO"))
+            throw new InvalidOperationException("Estado de casillero invalido");
+
+        return estadoNormalizado == "EN_MANTENIMIENTO" ? "MANTENIMIENTO" : estadoNormalizado;
     }
 
     private static PrestamoDto MapearPrestamo(PrestamoCasillero prestamo)

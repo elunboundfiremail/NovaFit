@@ -20,6 +20,18 @@ export class CasilleroService {
     return this.http.get<Casillero[]>(`${this.apiUrl}/disponibles`);
   }
 
+  create(casillero: Partial<Casillero>): Observable<Casillero> {
+    return this.http.post<Casillero>(this.apiUrl, casillero);
+  }
+
+  update(id: string, casillero: Partial<Casillero>): Observable<Casillero> {
+    return this.http.put<Casillero>(`${this.apiUrl}/${id}`, casillero);
+  }
+
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
   prestar(data: { casilleroId: string; ingresoId: string; numeroTicket?: string; ciDepositado?: number }): Observable<PrestamoCasillero> {
     return this.http.post<PrestamoCasillero>(`${this.apiUrl}/prestar`, data);
   }

@@ -4,16 +4,22 @@
     <button (click)="nuevoCliente()" class="btn btn-primary">+ Nuevo Cliente</button>
   </div>
 
+  <div class="alert-message" *ngIf="mensaje">{{ mensaje }}</div>
+
   <div class="grid-layout">
     <!-- Lista de clientes -->
     <div class="card clientes-lista">
       <h3>Clientes Registrados</h3>
       <div class="search-box">
-        <input type="text" placeholder="🔍 Buscar por CI o nombre..." class="input-search">
+        <input
+          type="text"
+          [(ngModel)]="busqueda"
+          placeholder="🔍 Buscar por CI o nombre..."
+          class="input-search">
       </div>
       <div class="lista-scroll">
         <div 
-          *ngFor="let cliente of clientes" 
+          *ngFor="let cliente of clientesFiltrados" 
           (click)="seleccionarCliente(cliente)"
           [class.selected]="clienteSeleccionado?.id === cliente.id"
           class="cliente-item">
@@ -62,14 +68,20 @@
           </div>
         </div>
         <div class="form-actions">
-          <button (click)="guardarCliente()" class="btn btn-primary">Guardar</button>
-          <button (click)="clienteSeleccionado = null; modoEdicion = false" class="btn btn-secondary">Cancelar</button>
+          <button (click)="guardarCliente()" class="btn btn-primary">
+            {{ modoEdicion ? 'Guardar cambios' : 'Guardar' }}
+          </button>
+          <button (click)="nuevoCliente()" class="btn btn-secondary">Cancelar</button>
         </div>
       </div>
 
       <!-- Detalle cliente -->
       <div *ngIf="clienteSeleccionado && !modoEdicion" class="cliente-detalle">
         <h3>Información del Cliente</h3>
+        <div class="detalle-acciones">
+          <button (click)="editarCliente(clienteSeleccionado)" class="btn btn-primary btn-sm">Editar</button>
+          <button (click)="eliminarCliente(clienteSeleccionado)" class="btn btn-danger btn-sm">Eliminar</button>
+        </div>
         <div class="info-grid">
           <div class="info-item">
             <span class="info-label">CI:</span>

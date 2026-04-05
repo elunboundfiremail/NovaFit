@@ -32,7 +32,15 @@ export class SuscripcionService {
     return this.http.post<Suscripcion>(this.apiUrl, suscripcion);
   }
 
+  update(id: string, suscripcion: Partial<Suscripcion>): Observable<Suscripcion> {
+    return this.http.put<Suscripcion>(`${this.apiUrl}/${id}`, suscripcion);
+  }
+
   cancelar(id: string): Observable<boolean> {
     return this.http.put<boolean>(`${this.apiUrl}/${id}/cancelar`, {});
+  }
+
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

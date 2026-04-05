@@ -34,6 +34,19 @@ public class CasilleroRepository : ICasilleroRepository
         return await _context.Casilleros.FindAsync(id);
     }
 
+    public async Task<Casillero?> ObtenerPorNumero(int numero)
+    {
+        return await _context.Casilleros
+            .FirstOrDefaultAsync(c => c.Numero == numero && !c.Eliminado);
+    }
+
+    public async Task<Casillero> CrearCasillero(Casillero casillero)
+    {
+        _context.Casilleros.Add(casillero);
+        await _context.SaveChangesAsync();
+        return casillero;
+    }
+
     public async Task<Casillero> ActualizarCasillero(Casillero casillero)
     {
         _context.Casilleros.Update(casillero);

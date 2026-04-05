@@ -1,7 +1,17 @@
 .form-inline {
   display: flex;
+  flex-wrap: wrap;
   gap: 15px;
   align-items: center;
+}
+
+.alert-message {
+  margin-bottom: 15px;
+  padding: 12px 14px;
+  background: rgba(0, 212, 255, 0.08);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 6px;
+  color: var(--text-primary);
 }
 
 .form-control {
@@ -65,4 +75,25 @@ select.form-control {
 
 .cliente-nombre {
   font-weight: 500;
+}
+
+.acciones {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-sm {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.btn-danger {
+  background: #d9534f;
+  color: #fff;
+  border: 1px solid #d9534f;
+}
+
+.btn-danger:hover {
+  background: #c9302c;
+  border-color: #c9302c;
 }

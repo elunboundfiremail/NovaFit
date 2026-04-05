@@ -9,6 +9,43 @@
     </div>
   </div>
 
+  <div class="alert-message" *ngIf="mensaje">{{ mensaje }}</div>
+
+  <div class="card" #casilleroFormCard [class.card-editing]="editandoCasilleroId">
+    <h3>{{ editandoCasilleroId ? 'Editar Casillero' : 'Nuevo Casillero' }}</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Número</label>
+        <input type="number" [(ngModel)]="casilleroForm.numero" class="form-control">
+      </div>
+      <div class="form-group">
+        <label>Tipo</label>
+        <select [(ngModel)]="casilleroForm.tipo" class="form-control">
+          <option value="FIJO">Fijo</option>
+          <option value="TEMPORAL">Temporal</option>
+          <option value="ESTANTE_RECEPCION">Estante</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Estado</label>
+        <select [(ngModel)]="casilleroForm.estado" class="form-control">
+          <option value="DISPONIBLE">Activo / Disponible</option>
+          <option value="MANTENIMIENTO">Mantenimiento</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Ubicación</label>
+        <input type="text" [(ngModel)]="casilleroForm.ubicacion" class="form-control">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button (click)="guardarCasillero()" class="btn btn-primary">
+        {{ editandoCasilleroId ? 'Guardar cambios' : 'Añadir casillero' }}
+      </button>
+      <button *ngIf="editandoCasilleroId" (click)="nuevoCasillero()" class="btn btn-secondary">Cancelar</button>
+    </div>
+  </div>
+
   <!-- Mapa visual de casilleros -->
   <div class="card">
     <h3>Estado de Casilleros</h3>
@@ -23,6 +60,27 @@
         <div class="casillero-estado">{{ casillero.estado }}</div>
         <div class="casillero-ubicacion" *ngIf="casillero.ubicacion">
           📍 {{ casillero.ubicacion }}
+        </div>
+        <div class="casillero-actions">
+          <button (click)="editarCasillero(casillero); $event.stopPropagation()" class="btn btn-primary btn-xs">Editar</button>
+          <button
+            *ngIf="casillero.estado === 'MANTENIMIENTO'"
+            (click)="cambiarEstado(casillero, 'DISPONIBLE'); $event.stopPropagation()"
+            class="btn btn-success btn-xs">
+            Activar
+          </button>
+          <button
+            *ngIf="casillero.estado !== 'MANTENIMIENTO' && casillero.estado !== 'OCUPADO'"
+            (click)="cambiarEstado(casillero, 'MANTENIMIENTO'); $event.stopPropagation()"
+            class="btn btn-warning btn-xs">
+            Mantenimiento
+          </button>
+          <button
+            *ngIf="casillero.estado !== 'OCUPADO'"
+            (click)="eliminarCasillero(casillero); $event.stopPropagation()"
+            class="btn btn-danger btn-xs">
+            Eliminar
+          </button>
         </div>
       </div>
     </div>

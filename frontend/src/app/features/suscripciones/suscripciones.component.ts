@@ -15,6 +15,9 @@ import { Suscripcion, Cliente } from '../../core/models/models';
 export class SuscripcionesComponent implements OnInit {
   suscripciones: Suscripcion[] = [];
   clientes: Cliente[] = [];
+  loading = false;
+  mensaje = '';
+  editandoId: string | null = null;
   
   formulario: {
     clienteId: string;
@@ -44,9 +47,16 @@ export class SuscripcionesComponent implements OnInit {
   }
 
   cargarSuscripciones() {
+    this.loading = true;
     this.suscripcionService.getAll().subscribe({
-      next: (data) => this.suscripciones = data,
-      error: () => console.error('Error')
+      next: (data) => {
+        this.suscripciones = data;
+        this.loading = false;
+      },
+      error: () => {
+        this.mensaje = '❌ Error al cargar suscripciones';
+        this.loading = false;
+      }
     });
   }
 
@@ -63,17 +73,74 @@ export class SuscripcionesComponent implements OnInit {
 
   crearSuscripcion() {
     if (!this.formulario.clienteId) {
-      alert('Seleccione un cliente');
+      this.mensaje = '❌ Seleccione un cliente';
       return;
     }
 
-    this.suscripcionService.create(this.formulario).subscribe({
+    const request = this.editandoId
+      ? this.suscripcionService.update(this.editandoId, this.formulario)
+      : this.suscripcionService.create(this.formulario);
+
+    request.subscribe({
       next: () => {
-        alert('✅ Suscripción creada');
+        this.mensaje = this.editandoId ? '✅ Suscripción actualizada' : '✅ Suscripción creada';
         this.cargarSuscripciones();
-        this.formulario.clienteId = '';
+        this.resetFormulario();
       },
-      error: () => alert('❌ Error al crear suscripción')
+      error: (err) => {
+        const detalle = typeof err.error === 'string' ? err.error : err.error?.message;
+        this.mensaje = `❌ ${detalle || 'Error al guardar suscripción'}`;
+      }
     });
+  }
+
+  editarSuscripcion(suscripcion: Suscripcion) {
+    this.editandoId = suscripcion.id;
+    this.formulario = {
+      clienteId: suscripcion.clienteId,
+      tipo: (suscripcion.tipo?.toUpperCase() || 'MENSUAL') as 'CASUAL' | 'MENSUAL' | 'ANUAL',
+      precio: suscripcion.precio
+    };
+    this.actualizarPrecio();
+    this.mensaje = `✏️ Editando suscripción ${suscripcion.id.substring(0, 8)}`;
+  }
+
+  eliminarSuscripcion(suscripcion: Suscripcion) {
+    const confirmar = confirm(`¿Eliminar la suscripción de ${this.obtenerNombreCliente(suscripcion.clienteId)}?`);
+    if (!confirmar) {
+      return;
+    }
+
+    this.suscripcionService.delete(suscripcion.id).subscribe({
+      next: () => {
+        this.mensaje = '✅ Suscripción eliminada';
+        this.cargarSuscripciones();
+        if (this.editandoId === suscripcion.id) {
+          this.resetFormulario();
+        }
+      },
+      error: () => {
+        this.mensaje = '❌ Error al eliminar suscripción';
+      }
+    });
+  }
+
+  cancelarEdicion() {
+    this.resetFormulario();
+  }
+
+  obtenerNombreCliente(clienteId: string): string {
+    const cliente = this.clientes.find(c => c.id === clienteId);
+    return cliente ? `${cliente.nombre} ${cliente.apellido}` : `Cliente #${clienteId.substring(0, 8)}`;
+  }
+
+  private resetFormulario() {
+    this.editandoId = null;
+    this.formulario = {
+      clienteId: '',
+      tipo: 'MENSUAL',
+      precio: 0
+    };
+    this.actualizarPrecio();
   }
 }

@@ -9,6 +9,22 @@ public class CasilleroDto
     public string? Ubicacion { get; set; }
 }
 
+public class CreateCasilleroDto
+{
+    public int Numero { get; set; }
+    public string Tipo { get; set; } = "TEMPORAL";
+    public string Estado { get; set; } = "DISPONIBLE";
+    public string? Ubicacion { get; set; }
+}
+
+public class UpdateCasilleroDto
+{
+    public int Numero { get; set; }
+    public string Tipo { get; set; } = "TEMPORAL";
+    public string Estado { get; set; } = "DISPONIBLE";
+    public string? Ubicacion { get; set; }
+}
+
 public class PrestamoDto
 {
     public Guid Id { get; set; }

@@ -37,6 +37,38 @@ public class SuscripcionService : ISuscripcionService
 
     public async Task<SuscripcionDto> Crear(CreateSuscripcionDto dto)
     {
+        ValidarDatos(dto.ClienteId, dto.Tipo, dto.Precio);
+
+        var cliente = await _clienteRepository.ObtenerPorId(dto.ClienteId);
+        if (cliente is null)
+            throw new InvalidOperationException("El cliente no existe");
+
+        var tipo = NormalizarTipo(dto.Tipo);
+        var ahora = DateTime.UtcNow.AddHours(-4);
+        var Suscripcion = new Suscripcion
+        {
+            Id = Guid.NewGuid(),
+            ClienteId = dto.ClienteId,
+            Tipo = tipo,
+            Precio = dto.Precio,
+            FechaInicio = ahora,
+            FechaVencimiento = CalcularFechaVencimiento(tipo, ahora),
+            Estado = "activa",
+            FechaCreacion = ahora
+        };
+
+        await _SuscripcionRepository.Crear(Suscripcion);
+        return MapearADto(Suscripcion);
+    }
+
+    public async Task<SuscripcionDto?> Actualizar(Guid id, UpdateSuscripcionDto dto)
+    {
+        var Suscripcion = await _SuscripcionRepository.ObtenerPorId(id);
+        if (Suscripcion is null)
+            return null;
+
+        ValidarDatos(dto.ClienteId, dto.Tipo, dto.Precio);
+
         if (dto.ClienteId == Guid.Empty)
             throw new InvalidOperationException("ClienteId es obligatorio");
 
@@ -44,27 +76,22 @@ public class SuscripcionService : ISuscripcionService
         if (cliente is null)
             throw new InvalidOperationException("El cliente no existe");
 
-        if (dto.Precio <= 0)
-            throw new InvalidOperationException("El Precio debe ser mayor a 0");
+        var tipo = NormalizarTipo(dto.Tipo);
+        Suscripcion.ClienteId = dto.ClienteId;
+        Suscripcion.Tipo = tipo;
+        Suscripcion.Precio = dto.Precio;
+        Suscripcion.FechaVencimiento = CalcularFechaVencimiento(tipo, Suscripcion.FechaInicio);
 
-        var Tipo = dto.Tipo.Trim().ToLowerInvariant();
-        if (Tipo is not ("mensual" or "anual"))
-            throw new InvalidOperationException("Tipo de plan invalido. Use mensual o anual");
-
-        var ahora = DateTime.UtcNow.AddHours(-4);
-        var Suscripcion = new Suscripcion
+        if (Suscripcion.Eliminado)
         {
-            Id = Guid.NewGuid(),
-            ClienteId = dto.ClienteId,
-            Tipo = Tipo,
-            Precio = dto.Precio,
-            FechaInicio = ahora,
-            FechaVencimiento = CalcularFechaVencimiento(Tipo, ahora),
-            Estado = "activa",
-            FechaCreacion = ahora
-        };
+            Suscripcion.Eliminado = false;
+            Suscripcion.FechaEliminacion = null;
+        }
 
-        await _SuscripcionRepository.Crear(Suscripcion);
+        if (Suscripcion.FechaVencimiento >= DateTime.UtcNow.AddHours(-4) && !string.Equals(Suscripcion.Estado, "cancelada", StringComparison.OrdinalIgnoreCase))
+            Suscripcion.Estado = "activa";
+
+        await _SuscripcionRepository.Actualizar(Suscripcion);
         return MapearADto(Suscripcion);
     }
 
@@ -79,10 +106,45 @@ public class SuscripcionService : ISuscripcionService
         return true;
     }
 
+    public async Task<bool> Eliminar(Guid id)
+    {
+        var Suscripcion = await _SuscripcionRepository.ObtenerPorId(id);
+        if (Suscripcion is null)
+            return false;
+
+        var ahora = DateTime.UtcNow.AddHours(-4);
+        Suscripcion.Eliminado = true;
+        Suscripcion.FechaEliminacion = ahora;
+        Suscripcion.Estado = "cancelada";
+        await _SuscripcionRepository.Actualizar(Suscripcion);
+        return true;
+    }
+
+    private static void ValidarDatos(Guid clienteId, string tipo, decimal precio)
+    {
+        if (clienteId == Guid.Empty)
+            throw new InvalidOperationException("ClienteId es obligatorio");
+
+        if (precio <= 0)
+            throw new InvalidOperationException("El Precio debe ser mayor a 0");
+
+        _ = NormalizarTipo(tipo);
+    }
+
+    private static string NormalizarTipo(string tipo)
+    {
+        var tipoNormalizado = tipo.Trim().ToLowerInvariant();
+        if (tipoNormalizado is not ("casual" or "mensual" or "anual"))
+            throw new InvalidOperationException("Tipo de plan invalido. Use casual, mensual o anual");
+
+        return tipoNormalizado;
+    }
+
     private static DateTime CalcularFechaVencimiento(string Tipo, DateTime fechaInicio)
     {
         return Tipo switch
         {
+            "casual" => fechaInicio.AddDays(1),
             "mensual" => fechaInicio.AddDays(30),
             "anual" => fechaInicio.AddDays(365),
             _ => fechaInicio

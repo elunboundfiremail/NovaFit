@@ -5,6 +5,15 @@
   margin-bottom: 30px;
 }
 
+.alert-message {
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  background: rgba(0, 212, 255, 0.08);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 6px;
+  color: var(--text-primary);
+}
+
 .grid-layout {
   display: grid;
   grid-template-columns: 350px 1fr;
@@ -92,6 +101,12 @@
   font-size: 16px;
 }
 
+.detalle-acciones {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -169,4 +184,20 @@
 
 .tabla-compacta th, .tabla-compacta td {
   padding: 8px 10px;
+}
+
+.btn-sm {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.btn-danger {
+  background: #d9534f;
+  color: #fff;
+  border: 1px solid #d9534f;
+}
+
+.btn-danger:hover {
+  background: #c9302c;
+  border-color: #c9302c;
 }

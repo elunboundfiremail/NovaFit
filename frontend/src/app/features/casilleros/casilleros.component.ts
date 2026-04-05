@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CasilleroService } from '../../core/services/casillero.service';
@@ -13,16 +13,26 @@ import { Casillero, Ingreso, PrestamoCasillero } from '../../core/models/models'
   styleUrls: ['./casilleros.component.css']
 })
 export class CasillerosComponent implements OnInit {
+  @ViewChild('casilleroFormCard') casilleroFormCard?: ElementRef<HTMLDivElement>;
+
   casilleros: Casillero[] = [];
   prestamosActivos: PrestamoCasillero[] = [];
   ingresosActivos: Ingreso[] = [];
+  mensaje = '';
   
   filtroTipo: string = 'TODOS';
   casilleroSeleccionado: Casillero | null = null;
+  editandoCasilleroId: string | null = null;
   prestamoForm = {
     ingresoId: '',
     numeroTicket: '',
     ciDepositado: null as number | null
+  };
+  casilleroForm = {
+    numero: 0,
+    tipo: 'TEMPORAL' as 'FIJO' | 'TEMPORAL' | 'ESTANTE_RECEPCION',
+    estado: 'DISPONIBLE' as 'DISPONIBLE' | 'MANTENIMIENTO',
+    ubicacion: ''
   };
 
   constructor(
@@ -102,7 +112,7 @@ export class CasillerosComponent implements OnInit {
       ciDepositado: this.prestamoForm.ciDepositado ?? undefined
     }).subscribe({
       next: () => {
-        alert('Casillero asignado correctamente');
+        this.mensaje = '✅ Casillero asignado correctamente';
         this.casilleroSeleccionado = null;
         this.cargarCasilleros();
         this.cargarPrestamos();
@@ -112,7 +122,7 @@ export class CasillerosComponent implements OnInit {
         const mensaje = typeof err.error === 'string'
           ? err.error
           : err.error?.message || err.message || 'No se pudo asignar el casillero';
-        alert(`Error al asignar casillero: ${mensaje}`);
+        this.mensaje = `❌ Error al asignar casillero: ${mensaje}`;
       }
     });
   }
@@ -120,11 +130,108 @@ export class CasillerosComponent implements OnInit {
   devolverCasillero(prestamoId: string) {
     this.casilleroService.devolver(prestamoId).subscribe({
       next: () => {
+        this.mensaje = '✅ Casillero devuelto correctamente';
         this.cargarCasilleros();
         this.cargarPrestamos();
         this.cargarIngresosActivos();
       },
-      error: () => alert('Error al devolver casillero')
+      error: () => this.mensaje = '❌ Error al devolver casillero'
+    });
+  }
+
+  editarCasillero(casillero: Casillero) {
+    this.editandoCasilleroId = casillero.id;
+    this.casilleroSeleccionado = null;
+    this.casilleroForm = {
+      numero: casillero.numero,
+      tipo: casillero.tipo,
+      estado: casillero.estado === 'MANTENIMIENTO' ? 'MANTENIMIENTO' : 'DISPONIBLE',
+      ubicacion: casillero.ubicacion || ''
+    };
+    this.mensaje = `✏️ Editando casillero #${casillero.numero}`;
+    setTimeout(() => {
+      this.casilleroFormCard?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
+  }
+
+  nuevoCasillero() {
+    this.editandoCasilleroId = null;
+    this.casilleroForm = {
+      numero: 0,
+      tipo: 'TEMPORAL',
+      estado: 'DISPONIBLE',
+      ubicacion: ''
+    };
+  }
+
+  guardarCasillero() {
+    if (!this.casilleroForm.numero) {
+      this.mensaje = '❌ Ingrese un número de casillero válido';
+      return;
+    }
+
+    const payload = {
+      numero: this.casilleroForm.numero,
+      tipo: this.casilleroForm.tipo,
+      estado: this.casilleroForm.estado,
+      ubicacion: this.casilleroForm.ubicacion.trim() || undefined
+    };
+
+    const request = this.editandoCasilleroId
+      ? this.casilleroService.update(this.editandoCasilleroId, payload)
+      : this.casilleroService.create(payload);
+
+    request.subscribe({
+      next: () => {
+        this.mensaje = this.editandoCasilleroId
+          ? '✅ Casillero actualizado correctamente'
+          : '✅ Casillero creado correctamente';
+        this.nuevoCasillero();
+        this.cargarCasilleros();
+      },
+      error: (err) => {
+        const detalle = typeof err.error === 'string' ? err.error : err.error?.message;
+        this.mensaje = `❌ ${detalle || 'No se pudo guardar el casillero'}`;
+      }
+    });
+  }
+
+  cambiarEstado(casillero: Casillero, estado: 'DISPONIBLE' | 'MANTENIMIENTO') {
+    this.casilleroService.update(casillero.id, {
+      numero: casillero.numero,
+      tipo: casillero.tipo,
+      estado,
+      ubicacion: casillero.ubicacion
+    }).subscribe({
+      next: () => {
+        this.mensaje = `✅ Casillero #${casillero.numero} actualizado a ${estado}`;
+        this.cargarCasilleros();
+      },
+      error: (err) => {
+        const detalle = typeof err.error === 'string' ? err.error : err.error?.message;
+        this.mensaje = `❌ ${detalle || 'No se pudo cambiar el estado del casillero'}`;
+      }
+    });
+  }
+
+  eliminarCasillero(casillero: Casillero) {
+    const confirmar = confirm(`¿Eliminar el casillero #${casillero.numero}?`);
+    if (!confirmar) {
+      return;
+    }
+
+    this.casilleroService.delete(casillero.id).subscribe({
+      next: () => {
+        this.mensaje = `✅ Casillero #${casillero.numero} eliminado`;
+        if (this.editandoCasilleroId === casillero.id) {
+          this.nuevoCasillero();
+        }
+        this.cargarCasilleros();
+      },
+      error: (err) => {
+        const detalle = typeof err.error === 'string' ? err.error : err.error?.message;
+        this.mensaje = `❌ ${detalle || 'No se pudo eliminar el casillero'}`;
+      }
     });
   }
 }
