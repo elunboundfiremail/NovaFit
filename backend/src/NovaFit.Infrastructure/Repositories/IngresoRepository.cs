@@ -24,26 +24,46 @@ public class IngresoRepository : IIngresoRepository
     public async Task<IEnumerable<Ingreso>> ObtenerTodos()
     {
         return await _context.Ingresos
+            .Include(i => i.Cliente)
             .ToListAsync();
     }
 
     public async Task<Ingreso?> ObtenerPorId(Guid id)
     {
         return await _context.Ingresos
+            .Include(i => i.Cliente)
             .FirstOrDefaultAsync(i => i.Id == id);
     }
 
     public async Task<IEnumerable<Ingreso>> ObtenerPorCliente(Guid clienteId)
     {
         return await _context.Ingresos
+            .Include(i => i.Cliente)
             .Where(i => i.ClienteId == clienteId)
             .ToListAsync();
+    }
+
+    public async Task<Ingreso?> ObtenerActivoPorCliente(Guid clienteId)
+    {
+        return await _context.Ingresos
+            .Include(i => i.Cliente)
+            .Where(i => i.ClienteId == clienteId && !i.SalidaRegistrada)
+            .OrderByDescending(i => i.FechaIngreso)
+            .FirstOrDefaultAsync();
     }
 
     public async Task<IEnumerable<Ingreso>> ObtenerRechazados()
     {
         return await _context.Ingresos
+            .Include(i => i.Cliente)
             .ToListAsync();
+    }
+
+    public async Task<Ingreso> Actualizar(Ingreso ingreso)
+    {
+        _context.Ingresos.Update(ingreso);
+        await _context.SaveChangesAsync();
+        return ingreso;
     }
 }
 

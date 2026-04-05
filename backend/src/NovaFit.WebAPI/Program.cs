@@ -13,6 +13,7 @@ var keycloakConfig = builder.Configuration.GetSection("Keycloak");
 var authority = keycloakConfig["Authority"];
 var audience = keycloakConfig["Audience"];
 var requireHttpsMetadata = keycloakConfig.GetValue<bool>("RequireHttpsMetadata");
+var metadataAddress = keycloakConfig["MetadataAddress"];
 
 // Agregar DbContext con PostgreSQL
 builder.Services.AddDbContext<NovaFitDbContext>(options =>
@@ -23,17 +24,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.Authority = authority;
-        options.Audience = audience;
         options.RequireHttpsMetadata = requireHttpsMetadata;
+        if (!string.IsNullOrWhiteSpace(metadataAddress))
+        {
+            options.MetadataAddress = metadataAddress;
+        }
         
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
+            ValidateAudience = false,
+            ValidateLifetime = false,
             ValidateIssuerSigningKey = true,
             ValidIssuer = authority,
-            ValidAudience = audience,
             ClockSkew = TimeSpan.Zero
         };
 

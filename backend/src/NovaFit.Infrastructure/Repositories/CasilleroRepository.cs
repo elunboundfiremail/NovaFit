@@ -85,5 +85,11 @@ public class CasilleroRepository : ICasilleroRepository
         return await _context.PrestamosCasilleros
             .AnyAsync(p => p.CasilleroId == casilleroId && p.FechaDevolucion == null);
     }
+
+    public async Task<bool> TienePrestamoActivoPorIngreso(Guid ingresoId)
+    {
+        return await _context.PrestamosCasilleros
+            .AnyAsync(p => p.IngresoId == ingresoId && p.FechaDevolucion == null && !p.Eliminado);
+    }
 }
 
