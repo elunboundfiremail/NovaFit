@@ -15,7 +15,9 @@
     <div class="casilleros-grid">
       <div 
         *ngFor="let casillero of casillerosFiltrados" 
-        [class]="'casillero-box ' + getClaseEstado(casillero.estado)">
+        [class]="'casillero-box ' + getClaseEstado(casillero.estado)"
+        [class.seleccionado]="casilleroSeleccionado?.id === casillero.id"
+        (click)="seleccionarCasillero(casillero)">
         <div class="casillero-numero">{{ casillero.numero }}</div>
         <div class="casillero-tipo">{{ casillero.tipo }}</div>
         <div class="casillero-estado">{{ casillero.estado }}</div>
@@ -23,6 +25,33 @@
           📍 {{ casillero.ubicacion }}
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="casilleroSeleccionado">
+    <h3>Asignar Casillero #{{ casilleroSeleccionado.numero }}</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Ingreso Activo</label>
+        <select [(ngModel)]="prestamoForm.ingresoId" class="form-control">
+          <option value="">Seleccione un cliente...</option>
+          <option *ngFor="let ingreso of ingresosActivos" [value]="ingreso.id">
+            {{ ingreso.ciCliente }} - {{ ingreso.nombreCliente || ('Cliente ' + ingreso.clienteId.substring(0, 8)) }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Ticket / Llave</label>
+        <input type="text" [(ngModel)]="prestamoForm.numeroTicket" class="form-control">
+      </div>
+      <div class="form-group">
+        <label>CI Depositado</label>
+        <input type="number" [(ngModel)]="prestamoForm.ciDepositado" class="form-control">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button (click)="asignarCasillero()" class="btn btn-primary">Asignar</button>
+      <button (click)="casilleroSeleccionado = null" class="btn btn-secondary">Cancelar</button>
     </div>
   </div>
 
