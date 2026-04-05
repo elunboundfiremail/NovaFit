@@ -81,7 +81,8 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__NovaFitDb: Host=postgres;Port=5432;Database=novafit_db;Username=novafit_user;Password=Upds123
-      Keycloak__Authority: http://keycloak:8080/realms/novafit-realm
+      Keycloak__Authority: http://localhost:8081/realms/novafit-realm
+      Keycloak__MetadataAddress: http://keycloak:8080/realms/novafit-realm/.well-known/openid-configuration
       Keycloak__Audience: novafit-api
     ports:
       - "8080:8080"

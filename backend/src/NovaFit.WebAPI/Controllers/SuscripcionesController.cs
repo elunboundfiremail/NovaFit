@@ -6,7 +6,7 @@ using NovaFit.Application.Interfaces;
 namespace NovaFit.WebAPI.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/suscripciones")]
 [Authorize]
 public class SuscripcionsController : ControllerBase
 {

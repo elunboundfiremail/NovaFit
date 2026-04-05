@@ -9,15 +9,18 @@ public class IngresoService : IIngresoService
     private readonly IIngresoRepository _ingresoRepository;
     private readonly IClienteRepository _clienteRepository;
     private readonly ISuscripcionRepository _SuscripcionRepository;
+    private readonly ICasilleroRepository _casilleroRepository;
 
     public IngresoService(
         IIngresoRepository ingresoRepository,
         IClienteRepository clienteRepository,
-        ISuscripcionRepository SuscripcionRepository)
+        ISuscripcionRepository SuscripcionRepository,
+        ICasilleroRepository casilleroRepository)
     {
         _ingresoRepository = ingresoRepository;
         _clienteRepository = clienteRepository;
         _SuscripcionRepository = SuscripcionRepository;
+        _casilleroRepository = casilleroRepository;
     }
 
     public async Task<IEnumerable<IngresoDto>> ObtenerTodos()
@@ -49,6 +52,10 @@ public class IngresoService : IIngresoService
         var cliente = await _clienteRepository.ObtenerPorCi(ci);
         if (cliente is null)
             throw new InvalidOperationException("Cliente no encontrado");
+
+        var ingresoActivo = await _ingresoRepository.ObtenerActivoPorCliente(cliente.Id);
+        if (ingresoActivo is not null)
+            throw new InvalidOperationException("El cliente ya tiene un ingreso activo");
 
         var ahora = DateTime.UtcNow.AddHours(-4);
         var ultimaSuscripcion = await _SuscripcionRepository.ObtenerUltimaPorCliente(cliente.Id);
@@ -89,6 +96,28 @@ public class IngresoService : IIngresoService
         return MapearADto(ingreso);
     }
 
+    public async Task<IngresoDto?> RegistrarSalida(Guid ingresoId)
+    {
+        var ingreso = await _ingresoRepository.ObtenerPorId(ingresoId);
+        if (ingreso is null)
+            return null;
+
+        if (await _casilleroRepository.TienePrestamoActivoPorIngreso(ingresoId))
+            throw new InvalidOperationException("Debe devolver la llave o casillero antes de registrar salida");
+
+        if (!ingreso.SalidaRegistrada)
+        {
+            var ahora = DateTime.UtcNow.AddHours(-4);
+            ingreso.HoraSalida = ahora.TimeOfDay;
+            ingreso.SalidaRegistrada = true;
+            ingreso.DuracionMinutos = (int)Math.Max(0, (ahora.TimeOfDay - ingreso.HoraIngreso).TotalMinutes);
+
+            await _ingresoRepository.Actualizar(ingreso);
+        }
+
+        return MapearADto(ingreso);
+    }
+
     private static IngresoDto MapearADto(Ingreso ingreso)
     {
         return new IngresoDto
@@ -101,6 +130,8 @@ public class IngresoService : IIngresoService
             HoraSalida = ingreso.HoraSalida,
             SalidaRegistrada = ingreso.SalidaRegistrada,
             DuracionMinutos = ingreso.DuracionMinutos,
+            NombreCliente = ingreso.Cliente is null ? string.Empty : $"{ingreso.Cliente.Nombre} {ingreso.Cliente.Apellido}".Trim(),
+            CiCliente = ingreso.Cliente?.Ci ?? 0
         };
     }
 }

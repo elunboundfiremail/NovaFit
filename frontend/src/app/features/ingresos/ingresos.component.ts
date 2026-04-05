@@ -77,8 +77,9 @@ export class IngresosComponent implements OnInit {
         this.loading = false;
         setTimeout(() => this.mensaje = '', 3000);
       },
-      error: () => {
-        this.mensaje = '❌ Error al registrar salida';
+      error: (err) => {
+        const detalle = typeof err.error === 'string' ? err.error : err.error?.message;
+        this.mensaje = `❌ ${detalle || 'Error al registrar salida'}`;
         this.loading = false;
       }
     });
