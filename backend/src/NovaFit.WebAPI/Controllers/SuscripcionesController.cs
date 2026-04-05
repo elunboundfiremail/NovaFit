@@ -58,11 +58,38 @@ public class SuscripcionsController : ControllerBase
         }
     }
 
+    [HttpPut("{id}")]
+    public async Task<ActionResult<SuscripcionDto>> Actualizar(Guid id, [FromBody] UpdateSuscripcionDto dto)
+    {
+        try
+        {
+            var suscripcion = await _SuscripcionService.Actualizar(id, dto);
+            if (suscripcion is null)
+                return NotFound("Suscripcion no encontrada");
+
+            return Ok(suscripcion);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [HttpPut("{id}/cancelar")]
     public async Task<ActionResult> CancelarSuscripcion(Guid id)
     {
         var cancelada = await _SuscripcionService.CancelarSuscripcion(id);
         if (!cancelada)
+            return NotFound("Suscripcion no encontrada");
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Eliminar(Guid id)
+    {
+        var eliminada = await _SuscripcionService.Eliminar(id);
+        if (!eliminada)
             return NotFound("Suscripcion no encontrada");
 
         return NoContent();

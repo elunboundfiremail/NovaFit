@@ -5,7 +5,8 @@
 
   <!-- Formulario nueva suscripción -->
   <div class="card">
-    <h3>Nueva Suscripción</h3>
+    <h3>{{ editandoId ? 'Editar Suscripción' : 'Nueva Suscripción' }}</h3>
+    <div class="alert-message" *ngIf="mensaje">{{ mensaje }}</div>
     <div class="form-inline">
       <select [(ngModel)]="formulario.clienteId" class="form-control">
         <option value="">Seleccione cliente...</option>
@@ -19,13 +20,16 @@
         <option value="ANUAL">Anual (Bs. 2000)</option>
       </select>
       <input type="number" [(ngModel)]="formulario.precio" class="form-control" readonly>
-      <button (click)="crearSuscripcion()" class="btn btn-primary">Crear</button>
+      <button (click)="crearSuscripcion()" class="btn btn-primary">
+        {{ editandoId ? 'Guardar cambios' : 'Crear' }}
+      </button>
+      <button *ngIf="editandoId" (click)="cancelarEdicion()" class="btn btn-secondary">Cancelar</button>
     </div>
   </div>
 
   <!-- Lista de suscripciones -->
   <div class="card">
-    <h3>Suscripciones Activas</h3>
+    <h3>Suscripciones Registradas</h3>
     <div class="table-container">
       <table>
         <thead>
@@ -37,11 +41,12 @@
             <th>Vencimiento</th>
             <th>Estado</th>
             <th>Ingresos</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let sus of suscripciones">
-            <td class="cliente-nombre">Cliente #{{ sus.clienteId.substring(0,8) }}</td>
+            <td class="cliente-nombre">{{ obtenerNombreCliente(sus.clienteId) }}</td>
             <td>
               <span class="badge-tipo">{{ sus.tipo }}</span>
             </td>
@@ -52,6 +57,10 @@
               <span [class]="'badge-estado-' + sus.estado.toLowerCase()">{{ sus.estado }}</span>
             </td>
             <td>{{ sus.ingresosTotalesUsados }}</td>
+            <td class="acciones">
+              <button (click)="editarSuscripcion(sus)" class="btn btn-primary btn-sm">Editar</button>
+              <button (click)="eliminarSuscripcion(sus)" class="btn btn-danger btn-sm">Eliminar</button>
+            </td>
           </tr>
         </tbody>
       </table>

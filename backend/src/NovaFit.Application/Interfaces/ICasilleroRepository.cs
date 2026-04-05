@@ -7,6 +7,8 @@ public interface ICasilleroRepository
     Task<IEnumerable<Casillero>> ObtenerTodos();
     Task<IEnumerable<Casillero>> ObtenerDisponibles();
     Task<Casillero?> ObtenerPorId(Guid id);
+    Task<Casillero?> ObtenerPorNumero(int numero);
+    Task<Casillero> CrearCasillero(Casillero casillero);
     Task<Casillero> ActualizarCasillero(Casillero casillero);
     Task<PrestamoCasillero> CrearPrestamo(PrestamoCasillero prestamo);
     Task<PrestamoCasillero?> ObtenerPrestamoPorId(Guid id);

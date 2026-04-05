@@ -18,6 +18,7 @@ public class SuscripcionRepository : ISuscripcionRepository
     {
         return await _context.Suscripcions
             .Include(m => m.Cliente)
+            .Where(m => !m.Eliminado)
             .OrderByDescending(m => m.FechaInicio)
             .ToListAsync();
     }
@@ -26,7 +27,7 @@ public class SuscripcionRepository : ISuscripcionRepository
     {
         return await _context.Suscripcions
             .Include(m => m.Cliente)
-            .FirstOrDefaultAsync(m => m.Id == id);
+            .FirstOrDefaultAsync(m => m.Id == id && !m.Eliminado);
     }
 
     public async Task<Suscripcion?> ObtenerActivaPorCliente(Guid clienteId)
@@ -35,6 +36,7 @@ public class SuscripcionRepository : ISuscripcionRepository
 
         return await _context.Suscripcions
             .Where(m => m.ClienteId == clienteId
+                && !m.Eliminado
                 && m.Estado == "activa"
                 && m.FechaVencimiento >= ahora)
             .OrderByDescending(m => m.FechaVencimiento)
@@ -44,7 +46,7 @@ public class SuscripcionRepository : ISuscripcionRepository
     public async Task<Suscripcion?> ObtenerUltimaPorCliente(Guid clienteId)
     {
         return await _context.Suscripcions
-            .Where(m => m.ClienteId == clienteId)
+            .Where(m => m.ClienteId == clienteId && !m.Eliminado)
             .OrderByDescending(m => m.FechaVencimiento)
             .FirstOrDefaultAsync();
     }

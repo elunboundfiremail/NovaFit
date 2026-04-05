@@ -41,6 +41,54 @@ public class CasillerosController : ControllerBase
         return Ok(casilleros);
     }
 
+    [HttpPost]
+    public async Task<ActionResult<CasilleroDto>> Crear([FromBody] CreateCasilleroDto dto)
+    {
+        try
+        {
+            var casillero = await _casilleroService.CrearCasillero(dto);
+            return CreatedAtAction(nameof(ObtenerPorId), new { id = casillero.Id }, casillero);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult<CasilleroDto>> Actualizar(Guid id, [FromBody] UpdateCasilleroDto dto)
+    {
+        try
+        {
+            var casillero = await _casilleroService.ActualizarCasillero(id, dto);
+            if (casillero is null)
+                return NotFound("Casillero no encontrado");
+
+            return Ok(casillero);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Eliminar(Guid id)
+    {
+        try
+        {
+            var eliminado = await _casilleroService.EliminarCasillero(id);
+            if (!eliminado)
+                return NotFound("Casillero no encontrado");
+
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [HttpGet("prestamos/activos")]
     public async Task<ActionResult<IEnumerable<PrestamoDto>>> ObtenerPrestamosActivos()
     {

@@ -5,6 +5,19 @@
   margin-bottom: 30px;
 }
 
+.alert-message {
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  background: rgba(0, 212, 255, 0.08);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 6px;
+  color: var(--text-primary);
+}
+
+.card-editing {
+  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.35);
+}
+
 .filtros {
   display: flex;
   gap: 10px;
@@ -45,6 +58,14 @@
   text-align: center;
   transition: all 0.2s;
   cursor: pointer;
+}
+
+.casillero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 10px;
 }
 
 .casillero-box:hover {
@@ -135,6 +156,33 @@
 .btn-sm {
   padding: 6px 14px;
   font-size: 13px;
+}
+
+.btn-xs {
+  padding: 5px 8px;
+  font-size: 11px;
+}
+
+.btn-danger {
+  background: #d9534f;
+  color: #fff;
+  border: 1px solid #d9534f;
+}
+
+.btn-danger:hover {
+  background: #c9302c;
+  border-color: #c9302c;
+}
+
+.btn-warning {
+  background: #f0ad4e;
+  color: #111;
+  border: 1px solid #f0ad4e;
+}
+
+.btn-warning:hover {
+  background: #ec971f;
+  border-color: #ec971f;
 }
 
 .form-grid {

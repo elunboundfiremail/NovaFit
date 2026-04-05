@@ -17,4 +17,11 @@ public class CreateSuscripcionDto
     public Guid ClienteId { get; set; }
     public string Tipo { get; set; } = "mensual";
     public decimal Precio { get; set; }
-    }
+}
+
+public class UpdateSuscripcionDto
+{
+    public Guid ClienteId { get; set; }
+    public string Tipo { get; set; } = "mensual";
+    public decimal Precio { get; set; }
+}
