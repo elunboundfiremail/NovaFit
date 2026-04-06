@@ -41,7 +41,7 @@ type TipoReporte = 'ingresos-mes' | 'ingresos-diarios' | 'ingresos-anuales' | 'i
           </div>
           <div class="reporte-card">
             <h4>💰 Ingresos Económicos</h4>
-            <p>Pagos del mes por cliente según su suscripción</p>
+            <p>Pagos diarios, mensuales y anuales por cliente según su suscripción</p>
             <button class="btn btn-primary" (click)="generarIngresosEconomicos()" [disabled]="loading">Generar</button>
           </div>
           <div class="reporte-card">
@@ -214,10 +214,13 @@ export class ReportesComponent {
 
   suscripcionesMes: Suscripcion[] = [];
   suscripcionesHoy: Suscripcion[] = [];
+  suscripcionesAnio: Suscripcion[] = [];
   totalIngresosHoy = 0;
   totalIngresosMes = 0;
+  totalIngresosAnio = 0;
   clientesConPagoHoy = 0;
   clientesConPagoMes = 0;
+  clientesConPagoAnio = 0;
 
   clientesActivos: Cliente[] = [];
   clientesMes: Cliente[] = [];
@@ -243,7 +246,7 @@ export class ReportesComponent {
       case 'ingresos-anuales':
         return 'Reporte: Ingresos Anuales';
       case 'ingresos-economicos':
-        return 'Reporte: Ingresos Económicos del Mes';
+        return 'Reporte: Ingresos Económicos';
       case 'clientes-activos':
         return 'Reporte: Clientes Activos y Suscritos';
       case 'uso-casilleros':
@@ -368,11 +371,16 @@ export class ReportesComponent {
         this.suscripcionesMes = [...suscripciones]
           .filter(s => this.esMismoMes(new Date(s.fechaInicio), ahora))
           .sort((a, b) => new Date(b.fechaInicio).getTime() - new Date(a.fechaInicio).getTime());
+        this.suscripcionesAnio = [...suscripciones]
+          .filter(s => this.esMismoAnio(new Date(s.fechaInicio), ahora))
+          .sort((a, b) => new Date(b.fechaInicio).getTime() - new Date(a.fechaInicio).getTime());
 
         this.totalIngresosHoy = this.suscripcionesHoy.reduce((total, s) => total + (s.precio || 0), 0);
         this.totalIngresosMes = this.suscripcionesMes.reduce((total, s) => total + (s.precio || 0), 0);
+        this.totalIngresosAnio = this.suscripcionesAnio.reduce((total, s) => total + (s.precio || 0), 0);
         this.clientesConPagoHoy = new Set(this.suscripcionesHoy.map(s => s.clienteId)).size;
         this.clientesConPagoMes = new Set(this.suscripcionesMes.map(s => s.clienteId)).size;
+        this.clientesConPagoAnio = new Set(this.suscripcionesAnio.map(s => s.clienteId)).size;
         this.finalizarReportePdf();
       },
       error: () => {
@@ -708,7 +716,10 @@ export class ReportesComponent {
           <div class="stat"><span class="stat-label">Clientes que pagaron hoy</span><span class="stat-value">${this.clientesConPagoHoy}</span></div>
           <div class="stat"><span class="stat-label">Ingresos del mes</span><span class="stat-value">${this.totalIngresosMes.toFixed(2)} Bs</span></div>
           <div class="stat"><span class="stat-label">Suscripciones del mes</span><span class="stat-value">${this.suscripcionesMes.length}</span></div>
-          <div class="stat"><span class="stat-label">Clientes que pagaron</span><span class="stat-value">${this.clientesConPagoMes}</span></div>
+          <div class="stat"><span class="stat-label">Clientes que pagaron en el mes</span><span class="stat-value">${this.clientesConPagoMes}</span></div>
+          <div class="stat"><span class="stat-label">Ingresos del año</span><span class="stat-value">${this.totalIngresosAnio.toFixed(2)} Bs</span></div>
+          <div class="stat"><span class="stat-label">Suscripciones del año</span><span class="stat-value">${this.suscripcionesAnio.length}</span></div>
+          <div class="stat"><span class="stat-label">Clientes que pagaron en el año</span><span class="stat-value">${this.clientesConPagoAnio}</span></div>
         </div>
         ${this.suscripcionesMes.length ? `
           <table>

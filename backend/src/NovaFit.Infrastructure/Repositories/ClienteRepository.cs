@@ -24,7 +24,8 @@ public class ClienteRepository : IClienteRepository
 
     public async Task<Cliente?> ObtenerPorId(Guid id)
     {
-        return await _context.Clientes.FindAsync(id);
+        return await _context.Clientes
+            .FirstOrDefaultAsync(c => c.Id == id && !c.Eliminado);
     }
 
     public async Task<Cliente?> ObtenerPorCi(int ci)
@@ -52,7 +53,9 @@ public class ClienteRepository : IClienteRepository
         var cliente = await ObtenerPorId(id);
         if (cliente == null) return false;
 
-        _context.Clientes.Remove(cliente);
+        cliente.Eliminado = true;
+        cliente.FechaEliminacion = DateTime.UtcNow.AddHours(-4);
+        _context.Clientes.Update(cliente);
         await _context.SaveChangesAsync();
         return true;
     }
