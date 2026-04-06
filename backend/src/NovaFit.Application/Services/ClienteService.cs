@@ -45,7 +45,7 @@ public class ClienteService : IClienteService
             Apellido = dto.Apellido,
             Email = dto.Email,
             Telefono = dto.Telefono,
-            FechaNacimiento = dto.FechaNacimiento,
+            FechaNacimiento = NormalizarFecha(dto.FechaNacimiento),
             FechaRegistro = DateTime.UtcNow.AddHours(-4)
         };
 
@@ -62,7 +62,7 @@ public class ClienteService : IClienteService
         if (dto.Apellido != null) cliente.Apellido = dto.Apellido;
         if (dto.Email != null) cliente.Email = dto.Email;
         if (dto.Telefono != null) cliente.Telefono = dto.Telefono;
-        if (dto.FechaNacimiento.HasValue) cliente.FechaNacimiento = dto.FechaNacimiento;
+        if (dto.FechaNacimiento.HasValue) cliente.FechaNacimiento = NormalizarFecha(dto.FechaNacimiento);
 
         await _repository.Actualizar(cliente);
         return MapearADto(cliente);
@@ -85,6 +85,21 @@ public class ClienteService : IClienteService
             Telefono = cliente.Telefono,
             FechaNacimiento = cliente.FechaNacimiento,
             FechaRegistro = cliente.FechaRegistro
+        };
+    }
+
+    private static DateTime? NormalizarFecha(DateTime? fecha)
+    {
+        if (!fecha.HasValue)
+        {
+            return null;
+        }
+
+        return fecha.Value.Kind switch
+        {
+            DateTimeKind.Utc => fecha.Value,
+            DateTimeKind.Local => fecha.Value.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(fecha.Value, DateTimeKind.Utc)
         };
     }
 }

@@ -58,40 +58,22 @@ public class IngresoService : IIngresoService
             throw new InvalidOperationException("El cliente ya tiene un ingreso activo");
 
         var ahora = DateTime.UtcNow.AddHours(-4);
-        var ultimaSuscripcion = await _SuscripcionRepository.ObtenerUltimaPorCliente(cliente.Id);
+        var suscripcionActiva = await _SuscripcionRepository.ObtenerActivaPorCliente(cliente.Id);
+        if (suscripcionActiva is null)
+            throw new InvalidOperationException("El cliente no tiene una suscripcion activa");
 
         var ingreso = new Ingreso
         {
             Id = Guid.NewGuid(),
             ClienteId = cliente.Id,
             FechaIngreso = ahora, HoraIngreso = ahora.TimeOfDay,
-            FechaCreacion = ahora
+            FechaCreacion = ahora,
+            SuscripcionId = suscripcionActiva.Id
         };
-
-        if (ultimaSuscripcion is null)
-        {
-            
-            
-        }
-        else if (!string.Equals(ultimaSuscripcion.Estado, "activa", StringComparison.OrdinalIgnoreCase))
-        {
-            
-            
-        }
-        else if (!ultimaSuscripcion.EstaVigente())
-        {
-            
-            
-        }
-        else
-        {
-            
-            ingreso.SuscripcionId = ultimaSuscripcion.Id;
-        }
 
         await _ingresoRepository.Crear(ingreso);
 
-        ingreso.Suscripcion = ingreso.SuscripcionId.HasValue ? ultimaSuscripcion : null;
+        ingreso.Suscripcion = suscripcionActiva;
 
         return MapearADto(ingreso);
     }
