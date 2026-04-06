@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { SuscripcionService } from '../../core/services/suscripcion.service';
 import { ClienteService } from '../../core/services/cliente.service';
 import { Suscripcion, Cliente } from '../../core/models/models';
@@ -8,7 +9,7 @@ import { Suscripcion, Cliente } from '../../core/models/models';
 @Component({
   selector: 'app-suscripciones',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './suscripciones.component.html',
   styleUrls: ['./suscripciones.component.css']
 })
@@ -18,7 +19,8 @@ export class SuscripcionesComponent implements OnInit {
   loading = false;
   mensaje = '';
   editandoId: string | null = null;
-  
+  clienteBusqueda = '';
+
   formulario: {
     clienteId: string;
     tipo: 'CASUAL' | 'MENSUAL' | 'ANUAL';
@@ -46,6 +48,34 @@ export class SuscripcionesComponent implements OnInit {
     this.actualizarPrecio();
   }
 
+  get clienteSeleccionado(): Cliente | undefined {
+    if (this.formulario.clienteId) {
+      return this.clientes.find(c => c.id === this.formulario.clienteId);
+    }
+
+    const ci = this.ciNormalizado;
+    if (!ci) {
+      return undefined;
+    }
+
+    return this.clientes.find(cliente => cliente.ci === ci);
+  }
+
+  get ciNormalizado(): number | null {
+    const texto = this.clienteBusqueda.trim();
+    if (!texto) {
+      return null;
+    }
+
+    const match = texto.match(/\d+/);
+    if (!match) {
+      return null;
+    }
+
+    const ci = Number(match[0]);
+    return Number.isFinite(ci) && ci > 0 ? ci : null;
+  }
+
   cargarSuscripciones() {
     this.loading = true;
     this.suscripcionService.getAll().subscribe({
@@ -62,7 +92,7 @@ export class SuscripcionesComponent implements OnInit {
 
   cargarClientes() {
     this.clienteService.getAll().subscribe({
-      next: (data) => this.clientes = data,
+      next: (data) => this.clientes = data.sort((a, b) => a.ci - b.ci),
       error: () => console.error('Error')
     });
   }
@@ -71,9 +101,16 @@ export class SuscripcionesComponent implements OnInit {
     this.formulario.precio = this.precios[this.formulario.tipo as keyof typeof this.precios] || 0;
   }
 
+  seleccionarClientePorBusqueda() {
+    const cliente = this.clienteSeleccionado;
+    this.formulario.clienteId = cliente?.id || '';
+  }
+
   crearSuscripcion() {
+    this.seleccionarClientePorBusqueda();
+
     if (!this.formulario.clienteId) {
-      this.mensaje = '❌ Seleccione un cliente';
+      this.mensaje = '❌ Seleccione un cliente valido por CI';
       return;
     }
 
@@ -101,6 +138,8 @@ export class SuscripcionesComponent implements OnInit {
       tipo: (suscripcion.tipo?.toUpperCase() || 'MENSUAL') as 'CASUAL' | 'MENSUAL' | 'ANUAL',
       precio: suscripcion.precio
     };
+    const cliente = this.clientes.find(c => c.id === suscripcion.clienteId);
+    this.clienteBusqueda = cliente ? cliente.ci.toString() : '';
     this.actualizarPrecio();
     this.mensaje = `✏️ Editando suscripción ${suscripcion.id.substring(0, 8)}`;
   }
@@ -136,6 +175,7 @@ export class SuscripcionesComponent implements OnInit {
 
   private resetFormulario() {
     this.editandoId = null;
+    this.clienteBusqueda = '';
     this.formulario = {
       clienteId: '',
       tipo: 'MENSUAL',

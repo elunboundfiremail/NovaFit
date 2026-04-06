@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -15,14 +14,8 @@ import { AuthService } from './core/services/auth.service';
   styles: [`
     .app-container {
       min-height: 100vh;
-      background: var(--bg-primary);
+      background: transparent;
     }
   `]
 })
-export class AppComponent {
-  constructor(private authService: AuthService) {}
-
-  ngOnInit() {
-    this.authService.ensureAuthenticated().subscribe();
-  }
-}
+export class AppComponent {}

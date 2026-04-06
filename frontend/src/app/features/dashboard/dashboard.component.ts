@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ClienteService } from '../../core/services/cliente.service';
 import { IngresoService } from '../../core/services/ingreso.service';
 import { SuscripcionService } from '../../core/services/suscripcion.service';
 import { CasilleroService } from '../../core/services/casillero.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,8 +21,7 @@ export class DashboardComponent {
     { path: '/clientes', icon: '👥', label: 'Clientes' },
     { path: '/suscripciones', icon: '💳', label: 'Suscripciones' },
     { path: '/casilleros', icon: '🔒', label: 'Casilleros' },
-    { path: '/reportes', icon: '📈', label: 'Reportes' },
-    { path: '/admin', icon: '⚙️', label: 'Administración' }
+    { path: '/reportes', icon: '📈', label: 'Reportes' }
   ];
 
   currentTime = new Date();
@@ -34,7 +34,9 @@ export class DashboardComponent {
     private ingresoService: IngresoService,
     private clienteService: ClienteService,
     private suscripcionService: SuscripcionService,
-    private casilleroService: CasilleroService
+    private casilleroService: CasilleroService,
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -43,6 +45,11 @@ export class DashboardComponent {
     }, 1000);
 
     this.cargarResumen();
+  }
+
+  cerrarSesion() {
+    this.authService.logout();
+    this.router.navigateByUrl('/login');
   }
 
   cargarResumen() {

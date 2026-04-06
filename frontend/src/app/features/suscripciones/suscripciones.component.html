@@ -1,19 +1,31 @@
 <div class="page-container">
   <div class="page-header">
     <h2>💳 Gestión de Suscripciones</h2>
+    <a routerLink="/dashboard" class="btn btn-secondary btn-back">← Volver</a>
   </div>
 
-  <!-- Formulario nueva suscripción -->
   <div class="card">
     <h3>{{ editandoId ? 'Editar Suscripción' : 'Nueva Suscripción' }}</h3>
     <div class="alert-message" *ngIf="mensaje">{{ mensaje }}</div>
     <div class="form-inline">
-      <select [(ngModel)]="formulario.clienteId" class="form-control">
-        <option value="">Seleccione cliente...</option>
-        <option *ngFor="let cliente of clientes" [value]="cliente.id">
-          {{ cliente.ci }} - {{ cliente.nombre }} {{ cliente.apellido }}
-        </option>
-      </select>
+      <div class="cliente-autocomplete">
+        <input
+          type="text"
+          list="clientes-ci-suscripciones"
+          [(ngModel)]="clienteBusqueda"
+          (ngModelChange)="seleccionarClientePorBusqueda()"
+          class="form-control"
+          placeholder="Ingrese CI del cliente">
+        <datalist id="clientes-ci-suscripciones">
+          <option *ngFor="let cliente of clientes" [value]="cliente.ci.toString()">
+            {{ cliente.nombre }} {{ cliente.apellido }}
+          </option>
+        </datalist>
+        <small *ngIf="clienteSeleccionado" class="cliente-preview">
+          Cliente: {{ clienteSeleccionado.nombre }} {{ clienteSeleccionado.apellido }}
+        </small>
+      </div>
+
       <select [(ngModel)]="formulario.tipo" (change)="actualizarPrecio()" class="form-control">
         <option value="CASUAL">Casual (Bs. 25)</option>
         <option value="MENSUAL">Mensual (Bs. 200)</option>
@@ -27,7 +39,6 @@
     </div>
   </div>
 
-  <!-- Lista de suscripciones -->
   <div class="card">
     <h3>Suscripciones Registradas</h3>
     <div class="table-container">
@@ -67,3 +78,4 @@
     </div>
   </div>
 </div>
+

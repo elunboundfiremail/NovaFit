@@ -115,13 +115,22 @@ public class CasilleroService : ICasilleroService
         if (await _casilleroRepository.TienePrestamoActivo(dto.CasilleroId))
             throw new InvalidOperationException("Casillero ya está en uso");
 
+        if (await _casilleroRepository.TienePrestamoActivoPorIngreso(dto.IngresoId))
+            throw new InvalidOperationException("El cliente ya tiene un resguardo activo");
+
         var ahora = DateTime.UtcNow.AddHours(-4);
+        var numeroTicket = string.IsNullOrWhiteSpace(dto.NumeroTicket) ? null : dto.NumeroTicket.Trim();
+        var numeroLlave = string.IsNullOrWhiteSpace(dto.NumeroLlave)
+            ? (numeroTicket is null ? (await _casilleroRepository.ObtenerSiguienteNumeroLlave()).ToString() : null)
+            : dto.NumeroLlave.Trim();
+
         var prestamo = new PrestamoCasillero
         {
             Id = Guid.NewGuid(),
             CasilleroId = dto.CasilleroId,
             IngresoId = dto.IngresoId,
-            NumeroTicket = dto.NumeroTicket,
+            NumeroTicket = numeroTicket,
+            NumeroLlave = numeroLlave,
             CiDepositado = dto.CiDepositado,
             FechaPrestamo = ahora,
             HoraPrestamo = ahora.TimeOfDay,
@@ -134,6 +143,44 @@ public class CasilleroService : ICasilleroService
         await _casilleroRepository.ActualizarCasillero(casillero);
 
         prestamo.Casillero = casillero;
+
+        return MapearPrestamo(prestamo);
+    }
+
+    public async Task<PrestamoDto> RegistrarTicketRecepcion(RegistrarTicketRecepcionDto dto)
+    {
+        if (dto.IngresoId == Guid.Empty)
+            throw new InvalidOperationException("IngresoId es obligatorio");
+
+        if (await _casilleroRepository.TienePrestamoActivoPorIngreso(dto.IngresoId))
+            throw new InvalidOperationException("El cliente ya tiene un resguardo activo");
+
+        var estanteRecepcion = (await _casilleroRepository.ObtenerTodos())
+            .Where(c => !c.Eliminado && c.Tipo == "ESTANTE_RECEPCION" && c.Estado == "DISPONIBLE")
+            .OrderBy(c => c.Numero)
+            .FirstOrDefault();
+
+        if (estanteRecepcion is null)
+            throw new InvalidOperationException("No hay tickets de recepcion disponibles");
+
+        var ahora = DateTime.UtcNow.AddHours(-4);
+        var siguienteTicket = await _casilleroRepository.ObtenerSiguienteNumeroTicket();
+        var prestamo = new PrestamoCasillero
+        {
+            Id = Guid.NewGuid(),
+            IngresoId = dto.IngresoId,
+            CasilleroId = estanteRecepcion.Id,
+            NumeroTicket = siguienteTicket.ToString(),
+            NumeroLlave = string.IsNullOrWhiteSpace(dto.Descripcion) ? null : dto.Descripcion.Trim(),
+            FechaPrestamo = ahora,
+            HoraPrestamo = ahora.TimeOfDay,
+            FechaCreacion = ahora
+        };
+
+        await _casilleroRepository.CrearPrestamo(prestamo);
+        estanteRecepcion.Estado = "OCUPADO";
+        await _casilleroRepository.ActualizarCasillero(estanteRecepcion);
+        prestamo = await _casilleroRepository.ObtenerPrestamoPorId(prestamo.Id) ?? prestamo;
 
         return MapearPrestamo(prestamo);
     }
@@ -220,6 +267,19 @@ public class CasilleroService : ICasilleroService
 
     private static PrestamoDto MapearPrestamo(PrestamoCasillero prestamo)
     {
+        var esTicketRecepcion = prestamo.Casillero?.Tipo == "ESTANTE_RECEPCION" && !string.IsNullOrWhiteSpace(prestamo.NumeroTicket);
+        var identificadorResguardo = !string.IsNullOrWhiteSpace(prestamo.NumeroLlave)
+            ? esTicketRecepcion ? prestamo.NumeroTicket : prestamo.NumeroLlave
+            : prestamo.NumeroTicket;
+
+        var tipoResguardo = esTicketRecepcion
+            ? "TICKET"
+            : !string.IsNullOrWhiteSpace(prestamo.NumeroLlave)
+            ? "LLAVE"
+            : !string.IsNullOrWhiteSpace(prestamo.NumeroTicket)
+                ? "TICKET"
+                : null;
+
         return new PrestamoDto
         {
             Id = prestamo.Id,
@@ -232,7 +292,14 @@ public class CasilleroService : ICasilleroService
             FechaPrestamo = prestamo.FechaPrestamo,
             FechaDevolucion = prestamo.FechaDevolucion,
             Devuelto = prestamo.Devuelto,
-            EstaActivo = prestamo.EstaActivo()
+            EstaActivo = prestamo.EstaActivo(),
+            NombreCliente = prestamo.Ingreso?.Cliente is not null
+                ? $"{prestamo.Ingreso.Cliente.Nombre} {prestamo.Ingreso.Cliente.Apellido}".Trim()
+                : null,
+            CiCliente = prestamo.Ingreso?.Cliente?.Ci,
+            TipoResguardo = tipoResguardo,
+            IdentificadorResguardo = identificadorResguardo,
+            Descripcion = esTicketRecepcion ? prestamo.NumeroLlave : null
         };
     }
 }

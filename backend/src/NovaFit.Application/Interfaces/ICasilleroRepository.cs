@@ -17,4 +17,6 @@ public interface ICasilleroRepository
     Task<IEnumerable<PrestamoCasillero>> ObtenerHistorialPorCasillero(Guid casilleroId);
     Task<bool> TienePrestamoActivo(Guid casilleroId);
     Task<bool> TienePrestamoActivoPorIngreso(Guid ingresoId);
+    Task<int> ObtenerSiguienteNumeroTicket();
+    Task<int> ObtenerSiguienteNumeroLlave();
 }

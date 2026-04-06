@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { ClienteService } from '../../core/services/cliente.service';
 import { IngresoService } from '../../core/services/ingreso.service';
 import { Cliente, Ingreso } from '../../core/models/models';
@@ -8,7 +9,7 @@ import { Cliente, Ingreso } from '../../core/models/models';
 @Component({
   selector: 'app-clientes',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './clientes.component.html',
   styleUrls: ['./clientes.component.css']
 })

@@ -11,6 +11,7 @@ public interface ICasilleroService
     Task<CasilleroDto?> ActualizarCasillero(Guid id, UpdateCasilleroDto dto);
     Task<bool> EliminarCasillero(Guid id);
     Task<PrestamoDto> PrestarCasillero(PrestarCasilleroDto dto);
+    Task<PrestamoDto> RegistrarTicketRecepcion(RegistrarTicketRecepcionDto dto);
     Task<PrestamoDto> DevolverCasillero(Guid prestamoId);
     Task<IEnumerable<PrestamoDto>> ObtenerPrestamosActivos();
     Task<IEnumerable<PrestamoDto>> ObtenerHistorial(Guid casilleroId);

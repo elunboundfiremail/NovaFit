@@ -5,6 +5,16 @@
   margin-bottom: 30px;
 }
 
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn-back {
+  white-space: nowrap;
+}
+
 .alert-message {
   margin-bottom: 20px;
   padding: 12px 14px;

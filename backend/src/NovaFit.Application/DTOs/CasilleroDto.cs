@@ -38,6 +38,11 @@ public class PrestamoDto
     public DateTime? FechaDevolucion { get; set; }
     public bool Devuelto { get; set; }
     public bool EstaActivo { get; set; }
+    public string? NombreCliente { get; set; }
+    public int? CiCliente { get; set; }
+    public string? TipoResguardo { get; set; }
+    public string? IdentificadorResguardo { get; set; }
+    public string? Descripcion { get; set; }
 }
 
 public class PrestarCasilleroDto
@@ -45,5 +50,12 @@ public class PrestarCasilleroDto
     public Guid CasilleroId { get; set; }
     public Guid IngresoId { get; set; }
     public string? NumeroTicket { get; set; }
+    public string? NumeroLlave { get; set; }
     public int? CiDepositado { get; set; }
+}
+
+public class RegistrarTicketRecepcionDto
+{
+    public Guid IngresoId { get; set; }
+    public string? Descripcion { get; set; }
 }

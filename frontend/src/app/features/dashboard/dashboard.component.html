@@ -1,5 +1,4 @@
 <div class="layout">
-  <!-- Sidebar izquierdo -->
   <aside class="sidebar">
     <div class="sidebar-header">
       <h1 class="logo">🏋️ NovaFit</h1>
@@ -28,10 +27,10 @@
       <div class="clock">
         {{ currentTime | date:'HH:mm:ss' }}
       </div>
+      <button class="logout-btn" (click)="cerrarSesion()">Cerrar sesión</button>
     </div>
   </aside>
 
-  <!-- Contenido principal -->
   <main class="main-content">
     <div class="content-header">
       <h2>Resumen del Día</h2>

@@ -1,33 +1,45 @@
 <div class="page-container">
   <div class="page-header">
-    <h2>🚪 Registro de Ingresos/Salidas</h2>
-    <p>Control de acceso al gimnasio</p>
+    <div>
+      <h2>🚪 Registro de Ingresos/Salidas</h2>
+      <p>Control de acceso al gimnasio</p>
+    </div>
+    <a routerLink="/dashboard" class="btn btn-secondary btn-back">← Volver</a>
   </div>
 
-  <!-- Formulario rápido de ingreso -->
   <div class="card registro-rapido">
     <h3>Registrar Ingreso</h3>
     <div class="form-inline">
-      <input 
-        type="number" 
-        [(ngModel)]="ci" 
-        placeholder="Ingrese CI del cliente"
-        (keyup.enter)="registrarIngreso()"
-        class="input-ci"
-        [disabled]="loading">
+      <div class="input-group-autocomplete">
+        <input 
+          type="text"
+          list="clientes-ci"
+          [(ngModel)]="ciBusqueda"
+          placeholder="Ingrese CI del cliente"
+          (keyup.enter)="registrarIngreso()"
+          class="input-ci"
+          [disabled]="loading">
+        <datalist id="clientes-ci">
+          <option *ngFor="let cliente of clientes" [value]="cliente.ci.toString()">
+            {{ cliente.nombre }} {{ cliente.apellido }}
+          </option>
+        </datalist>
+        <small *ngIf="clienteSeleccionado" class="cliente-preview">
+          Cliente: {{ clienteSeleccionado.nombre }} {{ clienteSeleccionado.apellido }}
+        </small>
+      </div>
       <button 
         (click)="registrarIngreso()" 
         class="btn btn-primary"
-        [disabled]="loading || !ci">
+        [disabled]="loading || !ciNormalizado">
         {{ loading ? 'Procesando...' : 'Registrar' }}
       </button>
     </div>
-    <p *ngIf="mensaje" [class]="mensaje.includes('✅') ? 'mensaje-exito' : 'mensaje-error'">
+    <p *ngIf="mensaje" [class]="mensaje.includes('Error') || mensaje.includes('autenticacion') ? 'mensaje-error' : 'mensaje-exito'">
       {{ mensaje }}
     </p>
   </div>
 
-  <!-- Tabla de ingresos activos -->
   <div class="card">
     <h3>Personas Actualmente en el Gimnasio</h3>
     <div class="table-container">
@@ -64,7 +76,6 @@
     </div>
   </div>
 
-  <!-- Historial del día -->
   <div class="card">
     <h3>Historial del Día</h3>
     <div class="table-container">
@@ -97,3 +108,4 @@
     </div>
   </div>
 </div>
+

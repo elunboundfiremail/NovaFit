@@ -2,7 +2,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .alert-message {
@@ -30,6 +30,22 @@
 
 select.form-control {
   cursor: pointer;
+}
+
+.cliente-autocomplete {
+  min-width: 280px;
+  flex: 1;
+}
+
+.cliente-autocomplete .form-control {
+  width: 100%;
+}
+
+.cliente-preview {
+  display: block;
+  margin-top: 8px;
+  color: var(--accent-primary);
+  font-weight: 500;
 }
 
 .badge-tipo {
@@ -96,4 +112,14 @@ select.form-control {
 .btn-danger:hover {
   background: #c9302c;
   border-color: #c9302c;
+}
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-back {
+  white-space: nowrap;
 }

@@ -59,10 +59,16 @@ export interface PrestamoCasillero {
   fechaDevolucion?: string;
   devuelto: boolean;
   estaActivo: boolean;
+  nombreCliente?: string;
+  ciCliente?: number;
+  tipoResguardo?: string;
+  identificadorResguardo?: string;
+  descripcion?: string;
 }
 
 export interface AuthResponse {
   access_token: string;
+  refresh_token?: string;
   expires_in: number;
   token_type: string;
 }

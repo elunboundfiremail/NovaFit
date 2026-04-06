@@ -117,6 +117,20 @@ public class CasillerosController : ControllerBase
         }
     }
 
+    [HttpPost("tickets")]
+    public async Task<ActionResult<PrestamoDto>> RegistrarTicketRecepcion([FromBody] RegistrarTicketRecepcionDto dto)
+    {
+        try
+        {
+            var ticket = await _casilleroService.RegistrarTicketRecepcion(dto);
+            return Ok(ticket);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [HttpPost("devolver/{prestamoId}")]
     public async Task<ActionResult<PrestamoDto>> DevolverCasillero(Guid prestamoId)
     {

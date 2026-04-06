@@ -4,7 +4,15 @@
 }
 
 .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 30px;
+  gap: 16px;
+}
+
+.btn-back {
+  white-space: nowrap;
 }
 
 .page-header h2 {
@@ -41,12 +49,16 @@
 .form-inline {
   display: flex;
   gap: 15px;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 15px;
 }
 
-.input-ci {
+.input-group-autocomplete {
   flex: 1;
+}
+
+.input-ci {
+  width: 100%;
   padding: 14px;
   font-size: 16px;
   border: 2px solid var(--border-color);
@@ -57,6 +69,13 @@
 
 .input-ci:focus {
   border-color: var(--accent-primary);
+}
+
+.cliente-preview {
+  display: block;
+  margin-top: 8px;
+  color: var(--accent-primary);
+  font-weight: 500;
 }
 
 .btn-sm {

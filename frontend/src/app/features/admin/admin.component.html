@@ -1,28 +1,10 @@
 <div class="page-container">
   <div class="page-header">
     <h2>⚙️ Administración (Datos Sensibles)</h2>
-    <button *ngIf="autenticado" (click)="cerrarSesion()" class="btn btn-danger">Cerrar Sesión</button>
+    <a routerLink="/dashboard" class="btn btn-secondary btn-back">← Volver</a>
   </div>
 
-  <!-- Login para acceso admin -->
-  <div *ngIf="!autenticado" class="login-admin">
-    <div class="login-box">
-      <h3>🔒 Autenticación Requerida</h3>
-      <p>Esta sección contiene operaciones sensibles</p>
-      <div class="form-group">
-        <label>Usuario</label>
-        <input type="text" [(ngModel)]="usuario" placeholder="admin" class="form-control">
-      </div>
-      <div class="form-group">
-        <label>Contraseña</label>
-        <input type="password" [(ngModel)]="contrasena" (keyup.enter)="verificarAcceso()" placeholder="••••••" class="form-control">
-      </div>
-      <button (click)="verificarAcceso()" class="btn btn-primary btn-block">Acceder</button>
-    </div>
-  </div>
-
-  <!-- Panel admin -->
-  <div *ngIf="autenticado" class="admin-panel">
+  <div class="admin-panel">
     <div class="tabs">
       <button 
         (click)="seccionActiva='clientes'" 
@@ -110,3 +92,4 @@
     </div>
   </div>
 </div>
+

@@ -1,32 +1,39 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { CasilleroService } from '../../core/services/casillero.service';
 import { IngresoService } from '../../core/services/ingreso.service';
-import { Casillero, Ingreso, PrestamoCasillero } from '../../core/models/models';
+import { ClienteService } from '../../core/services/cliente.service';
+import { Casillero, Cliente, Ingreso, PrestamoCasillero } from '../../core/models/models';
 
 @Component({
   selector: 'app-casilleros',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './casilleros.component.html',
   styleUrls: ['./casilleros.component.css']
 })
 export class CasillerosComponent implements OnInit {
-  @ViewChild('casilleroFormCard') casilleroFormCard?: ElementRef<HTMLDivElement>;
-
   casilleros: Casillero[] = [];
   prestamosActivos: PrestamoCasillero[] = [];
   ingresosActivos: Ingreso[] = [];
+  clientes: Cliente[] = [];
   mensaje = '';
   
   filtroTipo: string = 'TODOS';
   casilleroSeleccionado: Casillero | null = null;
   editandoCasilleroId: string | null = null;
-  prestamoForm = {
-    ingresoId: '',
-    numeroTicket: '',
+  modalCasilleroAbierto = false;
+  modalPrestamoAbierto = false;
+  modalTicketAbierto = false;
+  prestamoCasilleroForm = {
+    ciCliente: '',
     ciDepositado: null as number | null
+  };
+  ticketForm = {
+    ciCliente: '',
+    descripcion: ''
   };
   casilleroForm = {
     numero: 0,
@@ -37,13 +44,15 @@ export class CasillerosComponent implements OnInit {
 
   constructor(
     private casilleroService: CasilleroService,
-    private ingresoService: IngresoService
+    private ingresoService: IngresoService,
+    private clienteService: ClienteService
   ) {}
 
   ngOnInit() {
     this.cargarCasilleros();
     this.cargarPrestamos();
     this.cargarIngresosActivos();
+    this.cargarClientes();
   }
 
   cargarCasilleros() {
@@ -67,9 +76,77 @@ export class CasillerosComponent implements OnInit {
     });
   }
 
+  cargarClientes() {
+    this.clienteService.getAll().subscribe({
+      next: (data) => this.clientes = data,
+      error: () => console.error('Error al cargar clientes')
+    });
+  }
+
   get casillerosFiltrados() {
-    if (this.filtroTipo === 'TODOS') return this.casilleros;
-    return this.casilleros.filter(c => c.tipo === this.filtroTipo);
+    const casillerosFisicos = this.casilleros.filter(c => c.tipo !== 'ESTANTE_RECEPCION');
+    if (this.filtroTipo === 'TODOS') return casillerosFisicos;
+    return casillerosFisicos.filter(c => c.tipo === this.filtroTipo);
+  }
+
+  get ticketsRecepcion() {
+    return this.prestamosActivos.filter(prestamo => prestamo.tipoResguardo === 'TICKET' && !!prestamo.numeroTicket);
+  }
+
+  get clientesSugeridosPrestamo() {
+    return this.filtrarClientesPorCi(this.prestamoCasilleroForm.ciCliente);
+  }
+
+  get clientesSugeridosTicket() {
+    return this.filtrarClientesPorCi(this.ticketForm.ciCliente);
+  }
+
+  obtenerPrestamoActivo(casilleroId?: string) {
+    return this.prestamosActivos.find(prestamo => prestamo.casilleroId === casilleroId);
+  }
+
+  obtenerCasilleroPorId(casilleroId?: string) {
+    if (!casilleroId) {
+      return null;
+    }
+
+    return this.casilleros.find(casillero => casillero.id === casilleroId) ?? null;
+  }
+
+  get ingresoPrestamoSeleccionado(): Ingreso | null {
+    const ci = this.obtenerCiNumerico(this.prestamoCasilleroForm.ciCliente);
+    if (!ci) {
+      return null;
+    }
+
+    return this.ingresosActivos.find(ingreso => ingreso.ciCliente === ci) ?? null;
+  }
+
+  get ingresoTicketSeleccionado(): Ingreso | null {
+    const ci = this.obtenerCiNumerico(this.ticketForm.ciCliente);
+    if (!ci) {
+      return null;
+    }
+
+    return this.ingresosActivos.find(ingreso => ingreso.ciCliente === ci) ?? null;
+  }
+
+  get clientePrestamoSeleccionado(): Cliente | null {
+    const ci = this.obtenerCiNumerico(this.prestamoCasilleroForm.ciCliente);
+    if (!ci) {
+      return null;
+    }
+
+    return this.clientes.find(cliente => cliente.ci === ci) ?? null;
+  }
+
+  get clienteTicketSeleccionado(): Cliente | null {
+    const ci = this.obtenerCiNumerico(this.ticketForm.ciCliente);
+    if (!ci) {
+      return null;
+    }
+
+    return this.clientes.find(cliente => cliente.ci === ci) ?? null;
   }
 
   getClaseEstado(estado: string): string {
@@ -87,11 +164,51 @@ export class CasillerosComponent implements OnInit {
     }
 
     this.casilleroSeleccionado = casillero;
-    this.prestamoForm = {
-      ingresoId: '',
-      numeroTicket: '',
+    this.prestamoCasilleroForm = {
+      ciCliente: '',
       ciDepositado: null
     };
+  }
+
+  abrirPrestamo(casillero: Casillero) {
+    this.seleccionarCasillero(casillero);
+    this.modalPrestamoAbierto = true;
+    this.mensaje = `🔐 Asignando casillero #${casillero.numero}`;
+  }
+
+  cerrarModalPrestamo() {
+    this.modalPrestamoAbierto = false;
+    this.casilleroSeleccionado = null;
+    this.prestamoCasilleroForm = {
+      ciCliente: '',
+      ciDepositado: null
+    };
+  }
+
+  abrirModalTicket() {
+    this.modalTicketAbierto = true;
+    this.ticketForm = {
+      ciCliente: '',
+      descripcion: ''
+    };
+  }
+
+  cerrarModalTicket() {
+    this.modalTicketAbierto = false;
+    this.ticketForm = {
+      ciCliente: '',
+      descripcion: ''
+    };
+  }
+
+  devolverPrestamoDeCasillero(casillero: Casillero) {
+    const prestamo = this.obtenerPrestamoActivo(casillero.id);
+    if (!prestamo) {
+      this.mensaje = '❌ No se encontró un préstamo activo para este casillero';
+      return;
+    }
+
+    this.devolverCasillero(prestamo.id);
   }
 
   asignarCasillero() {
@@ -100,20 +217,28 @@ export class CasillerosComponent implements OnInit {
       return;
     }
 
-    if (!this.prestamoForm.ingresoId) {
-      alert('Seleccione un ingreso activo');
+    if (!this.obtenerCiNumerico(this.prestamoCasilleroForm.ciCliente)) {
+      alert('Ingrese el CI del cliente');
+      return;
+    }
+
+    const ingreso = this.ingresoPrestamoSeleccionado;
+    if (!ingreso) {
+      this.mensaje = this.clientePrestamoSeleccionado
+        ? '❌ El cliente existe, pero primero debe registrar su ingreso del día'
+        : '❌ El CI no existe en la base de datos. Registre primero al cliente';
       return;
     }
 
     this.casilleroService.prestar({
       casilleroId: this.casilleroSeleccionado.id,
-      ingresoId: this.prestamoForm.ingresoId,
-      numeroTicket: this.prestamoForm.numeroTicket || undefined,
-      ciDepositado: this.prestamoForm.ciDepositado ?? undefined
+      ingresoId: ingreso.id,
+      numeroLlave: this.casilleroSeleccionado.numero.toString(),
+      ciDepositado: this.prestamoCasilleroForm.ciDepositado ?? undefined
     }).subscribe({
       next: () => {
         this.mensaje = '✅ Casillero asignado correctamente';
-        this.casilleroSeleccionado = null;
+        this.cerrarModalPrestamo();
         this.cargarCasilleros();
         this.cargarPrestamos();
         this.cargarIngresosActivos();
@@ -123,6 +248,38 @@ export class CasillerosComponent implements OnInit {
           ? err.error
           : err.error?.message || err.message || 'No se pudo asignar el casillero';
         this.mensaje = `❌ Error al asignar casillero: ${mensaje}`;
+      }
+    });
+  }
+
+  registrarTicketRecepcion() {
+    if (!this.obtenerCiNumerico(this.ticketForm.ciCliente)) {
+      this.mensaje = '❌ Ingrese el CI del cliente';
+      return;
+    }
+
+    const ingreso = this.ingresoTicketSeleccionado;
+    if (!ingreso) {
+      this.mensaje = this.clienteTicketSeleccionado
+        ? '❌ El cliente existe, pero primero debe registrar su ingreso del día'
+        : '❌ El CI no existe en la base de datos. Registre primero al cliente';
+      return;
+    }
+
+    this.casilleroService.registrarTicketRecepcion({
+      ingresoId: ingreso.id,
+      descripcion: this.ticketForm.descripcion.trim() || undefined
+    }).subscribe({
+      next: () => {
+        this.mensaje = '✅ Ticket registrado en recepción';
+        this.cerrarModalTicket();
+        this.cargarPrestamos();
+      },
+      error: (err) => {
+        const mensaje = typeof err.error === 'string'
+          ? err.error
+          : err.error?.message || err.message || 'No se pudo registrar el ticket';
+        this.mensaje = `❌ Error al registrar ticket: ${mensaje}`;
       }
     });
   }
@@ -148,13 +305,24 @@ export class CasillerosComponent implements OnInit {
       estado: casillero.estado === 'MANTENIMIENTO' ? 'MANTENIMIENTO' : 'DISPONIBLE',
       ubicacion: casillero.ubicacion || ''
     };
+    this.modalCasilleroAbierto = true;
     this.mensaje = `✏️ Editando casillero #${casillero.numero}`;
-    setTimeout(() => {
-      this.casilleroFormCard?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 0);
   }
 
-  nuevoCasillero() {
+  abrirModalNuevoCasillero() {
+    this.editandoCasilleroId = null;
+    this.casilleroSeleccionado = null;
+    this.modalCasilleroAbierto = true;
+    this.casilleroForm = {
+      numero: 0,
+      tipo: 'TEMPORAL',
+      estado: 'DISPONIBLE',
+      ubicacion: ''
+    };
+  }
+
+  cerrarModalCasillero() {
+    this.modalCasilleroAbierto = false;
     this.editandoCasilleroId = null;
     this.casilleroForm = {
       numero: 0,
@@ -186,7 +354,7 @@ export class CasillerosComponent implements OnInit {
         this.mensaje = this.editandoCasilleroId
           ? '✅ Casillero actualizado correctamente'
           : '✅ Casillero creado correctamente';
-        this.nuevoCasillero();
+        this.cerrarModalCasillero();
         this.cargarCasilleros();
       },
       error: (err) => {
@@ -224,7 +392,7 @@ export class CasillerosComponent implements OnInit {
       next: () => {
         this.mensaje = `✅ Casillero #${casillero.numero} eliminado`;
         if (this.editandoCasilleroId === casillero.id) {
-          this.nuevoCasillero();
+          this.cerrarModalCasillero();
         }
         this.cargarCasilleros();
       },
@@ -233,5 +401,34 @@ export class CasillerosComponent implements OnInit {
         this.mensaje = `❌ ${detalle || 'No se pudo eliminar el casillero'}`;
       }
     });
+  }
+
+  seleccionarClientePrestamo(cliente: Cliente) {
+    this.prestamoCasilleroForm.ciCliente = cliente.ci.toString();
+  }
+
+  seleccionarClienteTicket(cliente: Cliente) {
+    this.ticketForm.ciCliente = cliente.ci.toString();
+  }
+
+  private filtrarClientesPorCi(valor: string): Cliente[] {
+    const termino = valor.trim();
+    if (!termino) {
+      return this.clientes.slice(0, 5);
+    }
+
+    return this.clientes
+      .filter(cliente => cliente.ci.toString().startsWith(termino))
+      .slice(0, 5);
+  }
+
+  private obtenerCiNumerico(valor: string): number | null {
+    const limpio = valor.trim();
+    if (!/^\d+$/.test(limpio)) {
+      return null;
+    }
+
+    const numero = Number(limpio);
+    return Number.isFinite(numero) ? numero : null;
   }
 }

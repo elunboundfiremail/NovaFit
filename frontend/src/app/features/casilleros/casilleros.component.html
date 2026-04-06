@@ -1,84 +1,84 @@
 <div class="page-container">
   <div class="page-header">
     <h2>🔒 Gestión de Casilleros</h2>
-    <div class="filtros">
+    <div class="header-actions">
+      <a routerLink="/dashboard" class="btn btn-secondary btn-back">← Volver</a>
+      <div class="filtros">
       <button (click)="filtroTipo='TODOS'" [class.active]="filtroTipo==='TODOS'" class="filtro-btn">Todos</button>
       <button (click)="filtroTipo='FIJO'" [class.active]="filtroTipo==='FIJO'" class="filtro-btn">Fijos</button>
       <button (click)="filtroTipo='TEMPORAL'" [class.active]="filtroTipo==='TEMPORAL'" class="filtro-btn">Temporales</button>
-      <button (click)="filtroTipo='ESTANTE_RECEPCION'" [class.active]="filtroTipo==='ESTANTE_RECEPCION'" class="filtro-btn">Estantes</button>
+      </div>
     </div>
   </div>
 
   <div class="alert-message" *ngIf="mensaje">{{ mensaje }}</div>
 
-  <div class="card" #casilleroFormCard [class.card-editing]="editandoCasilleroId">
-    <h3>{{ editandoCasilleroId ? 'Editar Casillero' : 'Nuevo Casillero' }}</h3>
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Número</label>
-        <input type="number" [(ngModel)]="casilleroForm.numero" class="form-control">
-      </div>
-      <div class="form-group">
-        <label>Tipo</label>
-        <select [(ngModel)]="casilleroForm.tipo" class="form-control">
-          <option value="FIJO">Fijo</option>
-          <option value="TEMPORAL">Temporal</option>
-          <option value="ESTANTE_RECEPCION">Estante</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Estado</label>
-        <select [(ngModel)]="casilleroForm.estado" class="form-control">
-          <option value="DISPONIBLE">Activo / Disponible</option>
-          <option value="MANTENIMIENTO">Mantenimiento</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Ubicación</label>
-        <input type="text" [(ngModel)]="casilleroForm.ubicacion" class="form-control">
-      </div>
-    </div>
-    <div class="form-actions">
-      <button (click)="guardarCasillero()" class="btn btn-primary">
-        {{ editandoCasilleroId ? 'Guardar cambios' : 'Añadir casillero' }}
-      </button>
-      <button *ngIf="editandoCasilleroId" (click)="nuevoCasillero()" class="btn btn-secondary">Cancelar</button>
-    </div>
-  </div>
-
   <!-- Mapa visual de casilleros -->
   <div class="card">
-    <h3>Estado de Casilleros</h3>
+    <div class="section-head">
+      <h3>Estado de Casilleros</h3>
+      <button (click)="abrirModalNuevoCasillero()" class="add-casillero-btn" title="Añadir casillero">
+        +
+      </button>
+    </div>
     <div class="casilleros-grid">
-      <div 
-        *ngFor="let casillero of casillerosFiltrados" 
-        [class]="'casillero-box ' + getClaseEstado(casillero.estado)"
-        [class.seleccionado]="casilleroSeleccionado?.id === casillero.id"
-        (click)="seleccionarCasillero(casillero)">
-        <div class="casillero-numero">{{ casillero.numero }}</div>
-        <div class="casillero-tipo">{{ casillero.tipo }}</div>
-        <div class="casillero-estado">{{ casillero.estado }}</div>
-        <div class="casillero-ubicacion" *ngIf="casillero.ubicacion">
-          📍 {{ casillero.ubicacion }}
+      <div *ngFor="let casillero of casillerosFiltrados" class="casillero-item">
+        <div 
+          [class]="'casillero-box ' + getClaseEstado(casillero.estado)"
+          [class.seleccionado]="casilleroSeleccionado?.id === casillero.id">
+          <div class="casillero-numero">{{ casillero.numero }}</div>
+          <div class="casillero-tipo">{{ casillero.tipo }}</div>
+          <div class="casillero-estado">{{ casillero.estado }}</div>
+          <div class="casillero-ubicacion" *ngIf="casillero.ubicacion">
+            📍 {{ casillero.ubicacion }}
+          </div>
+          <div class="casillero-actions" *ngIf="casillero.estado === 'DISPONIBLE'">
+            <button
+              (click)="abrirPrestamo(casillero)"
+              class="btn btn-primary btn-sm full-width">
+              Prestar
+            </button>
+          </div>
+          <ng-container *ngIf="casillero.estado === 'OCUPADO' && obtenerPrestamoActivo(casillero.id) as prestamo">
+            <div class="ocupacion-detalle">
+              <div class="ocupacion-cliente">{{ prestamo.nombreCliente || 'Cliente asignado' }}</div>
+              <div class="ocupacion-ci">CI: {{ prestamo.ciCliente || '--' }}</div>
+              <div class="ocupacion-resguardo">
+                <span class="resguardo-badge">{{ prestamo.tipoResguardo || 'RESGUARDO' }}</span>
+                <span class="resguardo-valor">{{ prestamo.identificadorResguardo || '--' }}</span>
+              </div>
+            </div>
+          </ng-container>
         </div>
-        <div class="casillero-actions">
-          <button (click)="editarCasillero(casillero); $event.stopPropagation()" class="btn btn-primary btn-xs">Editar</button>
-          <button
-            *ngIf="casillero.estado === 'MANTENIMIENTO'"
-            (click)="cambiarEstado(casillero, 'DISPONIBLE'); $event.stopPropagation()"
-            class="btn btn-success btn-xs">
-            Activar
-          </button>
-          <button
-            *ngIf="casillero.estado !== 'MANTENIMIENTO' && casillero.estado !== 'OCUPADO'"
-            (click)="cambiarEstado(casillero, 'MANTENIMIENTO'); $event.stopPropagation()"
-            class="btn btn-warning btn-xs">
-            Mantenimiento
-          </button>
+        <div class="casillero-actions casillero-actions-below">
           <button
             *ngIf="casillero.estado !== 'OCUPADO'"
-            (click)="eliminarCasillero(casillero); $event.stopPropagation()"
-            class="btn btn-danger btn-xs">
+            (click)="editarCasillero(casillero)"
+            class="btn btn-secondary btn-sm full-width">
+            Modificar
+          </button>
+          <button
+            *ngIf="casillero.estado === 'OCUPADO'"
+            (click)="devolverPrestamoDeCasillero(casillero)"
+            class="btn btn-success btn-sm full-width">
+            Devolver
+          </button>
+          <button
+            *ngIf="casillero.estado === 'DISPONIBLE'"
+            (click)="cambiarEstado(casillero, 'MANTENIMIENTO')"
+            class="btn btn-warning btn-sm full-width">
+            Deshabilitar
+          </button>
+          <button
+            *ngIf="casillero.estado === 'MANTENIMIENTO'"
+            (click)="cambiarEstado(casillero, 'DISPONIBLE')"
+            class="btn btn-success btn-sm full-width">
+            Habilitar
+          </button>
+          <button
+            *ngIf="casillero.estado === 'MANTENIMIENTO'"
+            (click)="eliminarCasillero(casillero)"
+            class="btn btn-danger btn-sm full-width">
             Eliminar
           </button>
         </div>
@@ -86,64 +86,162 @@
     </div>
   </div>
 
-  <div class="card" *ngIf="casilleroSeleccionado">
-    <h3>Asignar Casillero #{{ casilleroSeleccionado.numero }}</h3>
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Ingreso Activo</label>
-        <select [(ngModel)]="prestamoForm.ingresoId" class="form-control">
-          <option value="">Seleccione un cliente...</option>
-          <option *ngFor="let ingreso of ingresosActivos" [value]="ingreso.id">
-            {{ ingreso.ciCliente }} - {{ ingreso.nombreCliente || ('Cliente ' + ingreso.clienteId.substring(0, 8)) }}
-          </option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Ticket / Llave</label>
-        <input type="text" [(ngModel)]="prestamoForm.numeroTicket" class="form-control">
-      </div>
-      <div class="form-group">
-        <label>CI Depositado</label>
-        <input type="number" [(ngModel)]="prestamoForm.ciDepositado" class="form-control">
-      </div>
-    </div>
-    <div class="form-actions">
-      <button (click)="asignarCasillero()" class="btn btn-primary">Asignar</button>
-      <button (click)="casilleroSeleccionado = null" class="btn btn-secondary">Cancelar</button>
-    </div>
-  </div>
-
-  <!-- Préstamos activos -->
   <div class="card">
-    <h3>Préstamos Activos</h3>
+    <div class="section-head">
+      <h3>Tickets en Recepción</h3>
+      <button (click)="abrirModalTicket()" class="btn btn-primary">Agregar Ticket</button>
+    </div>
     <div class="table-container">
       <table>
         <thead>
           <tr>
-            <th>Casillero</th>
-            <th>Ticket/Llave</th>
-            <th>CI Depositado</th>
-            <th>Desde</th>
+            <th>Cliente</th>
+            <th>CI</th>
+            <th>Ticket</th>
+            <th>Descripción</th>
+            <th>Horario de Ingreso</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let prestamo of prestamosActivos">
-            <td><strong>#{{ prestamo.numeroCasillero }}</strong></td>
-            <td>{{ prestamo.numeroTicket || prestamo.numeroLlave || '--' }}</td>
-            <td>{{ prestamo.ciDepositado || '--' }}</td>
-            <td>{{ prestamo.fechaPrestamo | date:'dd/MM HH:mm' }}</td>
+          <tr *ngFor="let ticket of ticketsRecepcion">
+            <td>{{ ticket.nombreCliente || '--' }}</td>
+            <td>{{ ticket.ciCliente || '--' }}</td>
+            <td>{{ ticket.numeroTicket || '--' }}</td>
+            <td>{{ ticket.descripcion || '--' }}</td>
+            <td>{{ ticket.fechaPrestamo | date:'dd/MM HH:mm' }}</td>
             <td>
-              <button (click)="devolverCasillero(prestamo.id)" class="btn btn-success btn-sm">
+              <button (click)="devolverCasillero(ticket.id)" class="btn btn-success btn-sm">
                 Devolver
               </button>
             </td>
           </tr>
-          <tr *ngIf="prestamosActivos.length === 0">
-            <td colspan="5" class="text-center">No hay préstamos activos</td>
+          <tr *ngIf="ticketsRecepcion.length === 0">
+            <td colspan="6" class="text-center">No hay tickets en recepción</td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
+
+  <div class="modal-backdrop" *ngIf="modalCasilleroAbierto" (click)="cerrarModalCasillero()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-head">
+        <h3>{{ editandoCasilleroId ? 'Editar Casillero' : 'Nuevo Casillero' }}</h3>
+        <button class="modal-close" (click)="cerrarModalCasillero()">×</button>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Número</label>
+          <input type="number" [(ngModel)]="casilleroForm.numero" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>Tipo</label>
+          <select [(ngModel)]="casilleroForm.tipo" class="form-control">
+            <option value="FIJO">Fijo</option>
+            <option value="TEMPORAL">Temporal</option>
+            <option value="ESTANTE_RECEPCION">Estante</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Estado</label>
+          <select [(ngModel)]="casilleroForm.estado" class="form-control">
+            <option value="DISPONIBLE">Activo / Disponible</option>
+            <option value="MANTENIMIENTO">Mantenimiento</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Ubicación</label>
+          <input type="text" [(ngModel)]="casilleroForm.ubicacion" class="form-control">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button (click)="guardarCasillero()" class="btn btn-primary">
+          {{ editandoCasilleroId ? 'Guardar cambios' : 'Añadir casillero' }}
+        </button>
+        <button (click)="cerrarModalCasillero()" class="btn btn-secondary">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="modalPrestamoAbierto" (click)="cerrarModalPrestamo()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-head">
+        <h3>Asignar Casillero #{{ casilleroSeleccionado?.numero }}</h3>
+        <button class="modal-close" (click)="cerrarModalPrestamo()">×</button>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>CI del Cliente</label>
+          <input type="text" [(ngModel)]="prestamoCasilleroForm.ciCliente" class="form-control" placeholder="Ingrese el carnet del cliente" list="clientes-prestamo">
+          <datalist id="clientes-prestamo">
+            <option *ngFor="let cliente of clientesSugeridosPrestamo" [value]="cliente.ci.toString()">
+              {{ cliente.nombre }} {{ cliente.apellido }}
+            </option>
+          </datalist>
+          <div class="cliente-resuelto" *ngIf="ingresoPrestamoSeleccionado as ingreso">
+            {{ ingreso.nombreCliente }} · CI {{ ingreso.ciCliente }}
+          </div>
+          <div class="cliente-warning" *ngIf="clientePrestamoSeleccionado && !ingresoPrestamoSeleccionado">
+            Cliente encontrado. Primero debe registrar su ingreso del día.
+          </div>
+          <div class="cliente-warning" *ngIf="prestamoCasilleroForm.ciCliente.trim() && !clientePrestamoSeleccionado">
+            El CI no existe. Registre primero al cliente.
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Llave Asignada</label>
+          <div class="auto-asignado-box">
+            Se asignará automáticamente la llave del casillero #{{ casilleroSeleccionado?.numero }}
+          </div>
+        </div>
+        <div class="form-group">
+          <label>CI Depositado</label>
+          <input type="number" [(ngModel)]="prestamoCasilleroForm.ciDepositado" class="form-control">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button (click)="asignarCasillero()" class="btn btn-primary" [disabled]="!ingresoPrestamoSeleccionado">Asignar</button>
+        <button (click)="cerrarModalPrestamo()" class="btn btn-secondary">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="modalTicketAbierto" (click)="cerrarModalTicket()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-head">
+        <h3>Agregar Ticket en Recepción</h3>
+        <button class="modal-close" (click)="cerrarModalTicket()">×</button>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>CI del Cliente</label>
+          <input type="text" [(ngModel)]="ticketForm.ciCliente" class="form-control" placeholder="Ingrese el carnet del cliente" list="clientes-ticket">
+          <datalist id="clientes-ticket">
+            <option *ngFor="let cliente of clientesSugeridosTicket" [value]="cliente.ci.toString()">
+              {{ cliente.nombre }} {{ cliente.apellido }}
+            </option>
+          </datalist>
+          <div class="cliente-resuelto" *ngIf="ingresoTicketSeleccionado as ingreso">
+            {{ ingreso.nombreCliente }} · CI {{ ingreso.ciCliente }}
+          </div>
+          <div class="cliente-warning" *ngIf="clienteTicketSeleccionado && !ingresoTicketSeleccionado">
+            Cliente encontrado. Primero debe registrar su ingreso del día.
+          </div>
+          <div class="cliente-warning" *ngIf="ticketForm.ciCliente.trim() && !clienteTicketSeleccionado">
+            El CI no existe. Registre primero al cliente.
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <input type="text" [(ngModel)]="ticketForm.descripcion" class="form-control" placeholder="Opcional">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button (click)="registrarTicketRecepcion()" class="btn btn-primary" [disabled]="!ingresoTicketSeleccionado">Guardar Ticket</button>
+        <button (click)="cerrarModalTicket()" class="btn btn-secondary">Cancelar</button>
+      </div>
+    </div>
+  </div>
 </div>
+

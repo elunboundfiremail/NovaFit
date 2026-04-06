@@ -32,8 +32,18 @@ export class CasilleroService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  prestar(data: { casilleroId: string; ingresoId: string; numeroTicket?: string; ciDepositado?: number }): Observable<PrestamoCasillero> {
+  prestar(data: {
+    casilleroId: string;
+    ingresoId: string;
+    numeroTicket?: string;
+    numeroLlave?: string;
+    ciDepositado?: number;
+  }): Observable<PrestamoCasillero> {
     return this.http.post<PrestamoCasillero>(`${this.apiUrl}/prestar`, data);
+  }
+
+  registrarTicketRecepcion(data: { ingresoId: string; descripcion?: string }): Observable<PrestamoCasillero> {
+    return this.http.post<PrestamoCasillero>(`${this.apiUrl}/tickets`, data);
   }
 
   devolver(prestamoId: string): Observable<PrestamoCasillero> {
@@ -42,5 +52,9 @@ export class CasilleroService {
 
   getPrestamosActivos(): Observable<PrestamoCasillero[]> {
     return this.http.get<PrestamoCasillero[]>(`${this.apiUrl}/prestamos/activos`);
+  }
+
+  getHistorial(casilleroId: string): Observable<PrestamoCasillero[]> {
+    return this.http.get<PrestamoCasillero[]>(`${this.apiUrl}/historial/${casilleroId}`);
   }
 }

@@ -11,9 +11,15 @@ export class AuthService {
   private tokenSubject = new BehaviorSubject<string | null>(this.getStoredToken());
   public token$ = this.tokenSubject.asObservable();
   private refreshTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private readonly manualLoginKey = 'novafit_manual_login';
 
   constructor(private http: HttpClient) {
     const token = this.getStoredToken();
+    if (!this.hasManualLogin() && token) {
+      this.logout();
+      return;
+    }
+
     if (token && !this.isTokenExpired(token)) {
       this.scheduleRefresh(token);
     }
@@ -31,32 +37,64 @@ export class AuthService {
       params.toString(),
       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
     ).pipe(
-      tap(response => {
-        this.setToken(response.access_token);
-      })
+      tap(response => this.setSession(response, true))
     );
   }
 
   ensureAuthenticated(): Observable<boolean> {
-    const token = this.getToken();
+    if (!this.hasManualLogin()) {
+      this.logout();
+      return of(false);
+    }
 
+    const token = this.getToken();
     if (token && !this.isTokenExpired(token)) {
       this.scheduleRefresh(token);
       return of(true);
     }
 
-    return this.login(environment.authUsername, environment.authPassword).pipe(
-      tap(response => this.scheduleRefresh(response.access_token)),
+    const refreshToken = this.getStoredRefreshToken();
+    if (!refreshToken || this.isTokenExpired(refreshToken)) {
+      this.logout();
+      return of(false);
+    }
+
+    return this.refreshAccessToken().pipe(
       map(() => true),
       catchError(error => {
-        console.error('No se pudo autenticar automáticamente', error);
+        console.error('No se pudo renovar la sesion', error);
+        this.logout();
         return of(false);
       })
     );
   }
 
+  refreshAccessToken(): Observable<AuthResponse> {
+    const refreshToken = this.getStoredRefreshToken();
+    if (!refreshToken) {
+      return new Observable<AuthResponse>(subscriber => {
+        subscriber.error(new Error('No existe refresh token'));
+      });
+    }
+
+    const params = new URLSearchParams();
+    params.set('client_id', environment.keycloakClientId);
+    params.set('grant_type', 'refresh_token');
+    params.set('refresh_token', refreshToken);
+
+    return this.http.post<AuthResponse>(
+      `${environment.keycloakUrl}/realms/${environment.keycloakRealm}/protocol/openid-connect/token`,
+      params.toString(),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    ).pipe(
+      tap(response => this.setSession(response, false))
+    );
+  }
+
   logout(): void {
     localStorage.removeItem('token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem(this.manualLoginKey);
     this.tokenSubject.next(null);
     if (this.refreshTimeoutId) {
       clearTimeout(this.refreshTimeoutId);
@@ -69,17 +107,32 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    return this.hasManualLogin() && !!token && !this.isTokenExpired(token);
   }
 
-  private setToken(token: string): void {
-    localStorage.setItem('token', token);
-    this.tokenSubject.next(token);
-    this.scheduleRefresh(token);
+  private hasManualLogin(): boolean {
+    return localStorage.getItem(this.manualLoginKey) === 'true';
+  }
+
+  private setSession(response: AuthResponse, markManualLogin: boolean): void {
+    localStorage.setItem('token', response.access_token);
+    if (response.refresh_token) {
+      localStorage.setItem('refresh_token', response.refresh_token);
+    }
+    if (markManualLogin) {
+      localStorage.setItem(this.manualLoginKey, 'true');
+    }
+    this.tokenSubject.next(response.access_token);
+    this.scheduleRefresh(response.access_token);
   }
 
   private getStoredToken(): string | null {
     return localStorage.getItem('token');
+  }
+
+  private getStoredRefreshToken(): string | null {
+    return localStorage.getItem('refresh_token');
   }
 
   private isTokenExpired(token: string): boolean {
@@ -99,7 +152,8 @@ export class AuthService {
       }
 
       const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
-      const decoded = JSON.parse(atob(normalized));
+      const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
+      const decoded = JSON.parse(atob(padded));
       return typeof decoded.exp === 'number' ? decoded.exp * 1000 : null;
     } catch {
       return null;
@@ -119,8 +173,11 @@ export class AuthService {
     }
 
     this.refreshTimeoutId = setTimeout(() => {
-      this.login(environment.authUsername, environment.authPassword).subscribe({
-        error: (error) => console.error('No se pudo renovar el token', error)
+      this.refreshAccessToken().subscribe({
+        error: (error) => {
+          console.error('No se pudo renovar el token', error);
+          this.logout();
+        }
       });
     }, refreshInMs);
   }

@@ -1,20 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { IngresoService } from '../../core/services/ingreso.service';
 import { ClienteService } from '../../core/services/cliente.service';
-import { Ingreso } from '../../core/models/models';
+import { Cliente, Ingreso } from '../../core/models/models';
 
 @Component({
   selector: 'app-ingresos',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './ingresos.component.html',
   styleUrls: ['./ingresos.component.css']
 })
 export class IngresosComponent implements OnInit {
-  ci: number = 0;
+  ciBusqueda = '';
   ingresos: Ingreso[] = [];
+  clientes: Cliente[] = [];
   loading = false;
   mensaje = '';
 
@@ -24,12 +26,47 @@ export class IngresosComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.cargarClientes();
     this.cargarIngresos();
   }
 
-  // Getter para filtrar ingresos activos (sin salida)
   get ingresosActivos(): Ingreso[] {
     return this.ingresos.filter(i => !i.salidaRegistrada);
+  }
+
+  get clienteSeleccionado(): Cliente | undefined {
+    const ci = this.ciNormalizado;
+    if (!ci) {
+      return undefined;
+    }
+
+    return this.clientes.find(cliente => cliente.ci === ci);
+  }
+
+  get ciNormalizado(): number | null {
+    const texto = this.ciBusqueda.trim();
+    if (!texto) {
+      return null;
+    }
+
+    const match = texto.match(/\d+/);
+    if (!match) {
+      return null;
+    }
+
+    const ci = Number(match[0]);
+    return Number.isFinite(ci) && ci > 0 ? ci : null;
+  }
+
+  cargarClientes() {
+    this.clienteService.getAll().subscribe({
+      next: (clientes) => {
+        this.clientes = clientes.sort((a, b) => a.ci - b.ci);
+      },
+      error: () => {
+        this.mensaje = 'Error al cargar clientes para autocompletado';
+      }
+    });
   }
 
   cargarIngresos() {
@@ -47,22 +84,23 @@ export class IngresosComponent implements OnInit {
   }
 
   registrarIngreso() {
-    if (!this.ci || this.ci === 0) {
-      this.mensaje = 'Ingrese un CI válido';
+    const ci = this.ciNormalizado;
+    if (!ci) {
+      this.mensaje = 'Ingrese un CI valido';
       return;
     }
 
     this.loading = true;
-    this.ingresoService.registrarIngreso(this.ci).subscribe({
+    this.ingresoService.registrarIngreso(ci).subscribe({
       next: (ingreso) => {
-        this.mensaje = `✅ Ingreso registrado: ${ingreso.nombreCliente}`;
-        this.ci = 0;
+        this.mensaje = `Ingreso registrado: ${ingreso.nombreCliente}`;
+        this.ciBusqueda = '';
         this.cargarIngresos();
         this.loading = false;
         setTimeout(() => this.mensaje = '', 3000);
       },
       error: (err) => {
-        this.mensaje = `❌ Error: ${err.error?.message || 'Cliente no encontrado'}`;
+        this.mensaje = `Error: ${err.error?.message || 'Cliente no encontrado'}`;
         this.loading = false;
       }
     });
@@ -72,14 +110,14 @@ export class IngresosComponent implements OnInit {
     this.loading = true;
     this.ingresoService.registrarSalida(ingresoId).subscribe({
       next: () => {
-        this.mensaje = '✅ Salida registrada';
+        this.mensaje = 'Salida registrada';
         this.cargarIngresos();
         this.loading = false;
         setTimeout(() => this.mensaje = '', 3000);
       },
       error: (err) => {
         const detalle = typeof err.error === 'string' ? err.error : err.error?.message;
-        this.mensaje = `❌ ${detalle || 'Error al registrar salida'}`;
+        this.mensaje = detalle || 'Error al registrar salida';
         this.loading = false;
       }
     });

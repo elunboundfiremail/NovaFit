@@ -1,7 +1,10 @@
 <div class="page-container">
   <div class="page-header">
     <h2>👥 Gestión de Clientes</h2>
-    <button (click)="nuevoCliente()" class="btn btn-primary">+ Nuevo Cliente</button>
+    <div class="header-actions">
+      <a routerLink="/dashboard" class="btn btn-secondary btn-back">← Volver</a>
+      <button (click)="nuevoCliente()" class="btn btn-primary">+ Nuevo Cliente</button>
+    </div>
   </div>
 
   <div class="alert-message" *ngIf="mensaje">{{ mensaje }}</div>
@@ -126,3 +129,4 @@
     </div>
   </div>
 </div>
+
