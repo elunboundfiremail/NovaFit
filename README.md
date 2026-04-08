@@ -567,7 +567,6 @@ PostgreSQL es un sistema gestor de bases de datos relacional objeto (ORDBMS) de 
 | **Flujo Principal** | 1. El usuario navega al módulo "Reportes"<br>2. El usuario selecciona "Reporte de Suscripciones"<br>3. El sistema muestra filtros: Estado (ACTIVA/VENCIDA/CANCELADA), Tipo (CASUAL/MENSUAL/ANUAL), Rango de fechas<br>4. El usuario configura los filtros deseados<br>5. El usuario hace clic en "Generar Reporte"<br>6. El sistema consulta la base de datos aplicando los filtros<br>7. El sistema procesa los datos y calcula estadísticas (total por tipo, monto total recaudado)<br>8. El sistema muestra tabla con resultados y gráficos visuales<br>9. El usuario puede exportar el reporte (funcionalidad futura) |
 | **Postcondición** | Se visualiza el reporte con datos actualizados de la base de datos |
 
----
 
 # 5. DISEÑO DEL SISTEMA
 
@@ -1553,7 +1552,6 @@ El sistema fue sometido a pruebas manuales exhaustivas documentadas mediante cap
 ![Redirección exitosa](docs/imagenes/login/Captura%20de%20pantalla%202026-04-06%20171934.png)
 *Figura 3: Redirección exitosa al dashboard tras autenticación*
 
----
 
 ### Pruebas del Módulo Dashboard
 
@@ -1572,7 +1570,6 @@ El sistema fue sometido a pruebas manuales exhaustivas documentadas mediante cap
 ![Dashboard principal](docs/imagenes/dashboard/Captura%20de%20pantalla%202026-04-06%20172133.png)
 *Figura 4: Dashboard con resumen de estadísticas del gimnasio*
 
----
 
 ### Pruebas del Módulo Clientes
 
@@ -1663,7 +1660,6 @@ El sistema fue sometido a pruebas manuales exhaustivas documentadas mediante cap
 ![Cliente eliminado](docs/imagenes/clientes/Captura%20de%20pantalla%202026-04-06%20173121.png)
 *Figura 12: Cliente eliminado de la lista activa*
 
----
 
 ### Pruebas del Módulo Suscripciones
 
@@ -1724,7 +1720,6 @@ El sistema fue sometido a pruebas manuales exhaustivas documentadas mediante cap
 ![Precio con descuento](docs/imagenes/suscripciones/Captura%20de%20pantalla%202026-04-06%20180530.png)
 *Figura 18: Precio final con descuento aplicado*
 
----
 
 ### Pruebas del Módulo Ingresos/Salidas
 
@@ -1778,7 +1773,6 @@ El sistema fue sometido a pruebas manuales exhaustivas documentadas mediante cap
 ![Registrar salida](docs/imagenes/ingresos/Captura%20de%20pantalla%202026-04-06%20180437.png)
 *Figura 22: Registro de salida y cálculo de duración de sesión*
 
----
 
 ### Pruebas del Módulo Casilleros
 
@@ -1870,7 +1864,6 @@ El sistema fue sometido a pruebas manuales exhaustivas documentadas mediante cap
 ![Casillero fijo asignado](docs/imagenes/casilleros/Captura%20de%20pantalla%202026-04-06%20180113.png)
 *Figura 31: Casillero fijo asignado permanentemente*
 
----
 
 ### Pruebas del Módulo Reportes
 
@@ -1943,7 +1936,6 @@ El sistema fue sometido a pruebas manuales exhaustivas documentadas mediante cap
 ![Resumen visual](docs/imagenes/reportes/Captura%20de%20pantalla%202026-04-06%20181725.png)
 *Figura 38: Resumen visual del reporte*
 
----
 
 ## 7.2. Resultados de Pruebas
 
@@ -2041,7 +2033,6 @@ docker compose ps
 
 **Estas limitaciones son aceptables** dado el alcance académico del proyecto y el tiempo de desarrollo disponible.
 
----
 
 # 8. CONCLUSIONES Y RECOMENDACIONES
 
